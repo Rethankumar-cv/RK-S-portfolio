@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #030303;
+  --color-foreground: #f0f0f0;
+  
+  --font-sans: var(--font-inter), sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: #030303;
+    --foreground: #f0f0f0;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+}
