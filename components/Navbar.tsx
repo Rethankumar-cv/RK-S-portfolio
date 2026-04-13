@@ -8,6 +8,8 @@ const NAV_LINKS = [
   { name: "About", href: "#about" },
   { name: "Projects", href: "#projects" },
   { name: "Skills", href: "#skills" },
+  { name: "Process", href: "#process" },
+  { name: "Experience", href: "#experience" },
   { name: "Contact", href: "#contact" },
 ];
 
@@ -16,63 +18,70 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 40);
 
-      const sections = NAV_LINKS.map((link) => link.name.toLowerCase());
+      const sectionIds = NAV_LINKS.map((l) => l.href.replace("#", ""));
       let current = "";
 
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
           if (rect.top <= window.innerHeight / 2 && rect.bottom >= 100) {
-            current = section;
+            current = id;
           }
         }
       }
 
-      if (current !== activeSection) {
-        setActiveSection(current);
-      }
+      if (current !== activeSection) setActiveSection(current);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); 
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeSection]);
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    setMenuOpen(false); // Make sure it closes out if opened globally
-    const targetId = href.replace("#", "");
-    const elem = document.getElementById(targetId);
-    if (elem) {
-      elem.scrollIntoView({ behavior: "smooth" });
-    }
+    setMenuOpen(false);
+    const id = href.replace("#", "");
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <>
       <motion.header
-        initial={{ opacity: 0, y: -30 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-[60] flex justify-center mt-4 sm:mt-6 px-4 pointer-events-none"
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 right-0 z-[60] flex justify-center mt-4 sm:mt-5 px-4 pointer-events-none"
       >
-        <div 
+        <div
           className={cn(
-            "pointer-events-auto flex items-center justify-between px-6 py-3 rounded-full transition-all duration-500 shadow-xl",
-            scrolled 
-              ? "bg-[#030303]/70 backdrop-blur-xl border border-white/10 w-full max-w-3xl" 
-              : "bg-white/[0.04] backdrop-blur-md border border-white/[0.08] w-full max-w-4xl"
+            "pointer-events-auto flex items-center justify-between px-5 py-2.5 rounded-full transition-all duration-500",
+            scrolled
+              ? "bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.5)] w-full max-w-2xl"
+              : "bg-white/[0.03] backdrop-blur-md border border-white/[0.06] w-full max-w-3xl"
           )}
         >
           {/* Logo */}
-          <a 
-            href="#" 
-            className="text-lg sm:text-xl font-bold tracking-tighter text-white transition-all hover:opacity-80 relative z-50 p-2 -ml-2"
+          <a
+            href="#"
+            className="text-base sm:text-lg font-black tracking-tighter text-white hover:opacity-75 transition-opacity z-50 px-1"
             onClick={(e) => {
               e.preventDefault();
               setMenuOpen(false);
@@ -82,88 +91,131 @@ export default function Navbar() {
             RK<span className="text-indigo-400">.</span>
           </a>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => {
-              const isActive = activeSection === link.name.toLowerCase();
+          {/* Desktop nav — show only core 4 links */}
+          <nav className="hidden md:flex items-center gap-0.5">
+            {NAV_LINKS.slice(0, 4).map((link) => {
+              const isActive = activeSection === link.href.replace("#", "");
               return (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
                   className={cn(
-                    "relative px-5 py-2 text-sm font-medium transition-colors rounded-full",
-                    isActive ? "text-white" : "text-neutral-400 hover:text-white"
+                    "relative px-4 py-1.5 text-[13px] font-medium transition-all duration-200 rounded-full group",
+                    isActive ? "text-white" : "text-neutral-500 hover:text-neutral-200"
                   )}
                 >
                   {isActive && (
                     <motion.div
-                      layoutId="navbar-indicator"
-                      className="absolute inset-0 bg-white/10 border border-white/5 rounded-full"
-                      transition={{ type: "spring", bounce: 0.25, duration: 0.6 }}
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-white/[0.08] border border-white/[0.06] rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                     />
                   )}
-                  <span className="relative z-10 transition-shadow duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-                    {link.name}
-                  </span>
+                  <span className="relative z-10">{link.name}</span>
                 </a>
               );
             })}
           </nav>
 
-          {/* Native Mobile Hamburger Button */}
-          <button 
+          {/* Desktop CTA */}
+          <a
+            href="#contact"
+            onClick={(e) => handleLinkClick(e, "#contact")}
+            className="hidden md:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/[0.15] transition-all duration-200 text-[13px] font-medium text-neutral-300 hover:text-white"
+          >
+            Contact
+            <svg className="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7" />
+            </svg>
+          </a>
+
+          {/* Mobile hamburger */}
+          <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden relative z-50 p-2 -mr-2 text-neutral-300 hover:text-white transition-colors"
+            className="md:hidden relative z-50 p-2 -mr-1 text-neutral-400 hover:text-white transition-colors"
             aria-label="Toggle Navigation"
           >
-            <div className="w-6 h-5 flex flex-col justify-between items-center overflow-hidden">
-              <span className={cn("w-full h-[2px] bg-current transform transition-all duration-300 origin-left", menuOpen ? "rotate-45 translate-x-1" : "")} />
-              <span className={cn("w-full h-[2px] bg-current transition-all duration-300", menuOpen ? "translate-x-full opacity-0" : "")} />
-              <span className={cn("w-full h-[2px] bg-current transform transition-all duration-300 origin-left", menuOpen ? "-rotate-45 translate-x-1" : "")} />
+            <div className="w-5 h-4 flex flex-col justify-between">
+              <span
+                className={cn(
+                  "w-full h-[1.5px] bg-current transform transition-all duration-300 origin-left",
+                  menuOpen ? "rotate-45 translate-y-[-0.5px]" : ""
+                )}
+              />
+              <span
+                className={cn(
+                  "w-full h-[1.5px] bg-current transition-all duration-200",
+                  menuOpen ? "opacity-0 translate-x-2" : ""
+                )}
+              />
+              <span
+                className={cn(
+                  "w-full h-[1.5px] bg-current transform transition-all duration-300 origin-left",
+                  menuOpen ? "-rotate-45 translate-y-[0.5px]" : ""
+                )}
+              />
             </div>
           </button>
         </div>
       </motion.header>
 
-      {/* Massive Slide-in Mobile App Navigation Drawer */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {menuOpen && (
           <>
-            <motion.div 
+            {/* Backdrop */}
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] md:hidden"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[55] md:hidden"
             />
-            
+
+            {/* Drawer panel */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-[100dvh] w-4/5 max-w-sm bg-[#050505]/95 backdrop-blur-2xl border-l border-white/10 shadow-2xl z-[58] md:hidden flex flex-col justify-center px-8"
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              className="fixed top-0 right-0 h-[100dvh] w-[78vw] max-w-xs bg-[#080808]/98 backdrop-blur-2xl border-l border-white/[0.07] z-[58] md:hidden flex flex-col pt-24 pb-10 px-7"
             >
-              <nav className="flex flex-col gap-6 w-full relative z-10 mt-12">
-                {NAV_LINKS.map((link, i) => (
-                  <motion.a
-                    key={link.name}
-                    href={link.href}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 + 0.1 }}
-                    onClick={(e) => handleLinkClick(e, link.href)}
-                    className="text-2xl font-semibold tracking-wide text-neutral-300 active:text-white transition-colors py-4 border-b border-white/[0.05]"
-                  >
-                    {link.name}
-                  </motion.a>
-                ))}
+              <nav className="flex flex-col gap-1 flex-1">
+                {NAV_LINKS.map((link, i) => {
+                  const isActive = activeSection === link.href.replace("#", "");
+                  return (
+                    <motion.a
+                      key={link.name}
+                      href={link.href}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.06 + 0.05, duration: 0.35 }}
+                      onClick={(e) => handleLinkClick(e, link.href)}
+                      className={cn(
+                        "flex items-center justify-between py-3.5 px-4 rounded-xl text-lg font-semibold tracking-tight transition-colors",
+                        isActive
+                          ? "text-white bg-white/[0.06] border border-white/[0.08]"
+                          : "text-neutral-400 active:text-white active:bg-white/[0.04]"
+                      )}
+                    >
+                      {link.name}
+                      {isActive && (
+                        <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      )}
+                    </motion.a>
+                  );
+                })}
               </nav>
-              
-              {/* Bottom Decoration inside drawer */}
-              <div className="absolute bottom-12 left-8 right-8 text-xs text-neutral-500 font-medium tracking-widest uppercase">
-                rk • portfolio
+
+              {/* Drawer footer */}
+              <div className="border-t border-white/[0.06] pt-6 mt-4">
+                <p className="text-[11px] text-neutral-600 font-medium tracking-[0.15em] uppercase">
+                  Rethan Kumar · Portfolio
+                </p>
               </div>
             </motion.div>
           </>

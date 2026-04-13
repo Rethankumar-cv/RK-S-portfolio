@@ -30,4 +30,16 @@
   .glass {
     @apply bg-white/5 backdrop-blur-md border border-white/10;
   }
+  .glass-strong {
+    @apply bg-white/[0.06] backdrop-blur-xl border border-white/[0.12];
+  }
+  ::selection {
+    background: rgba(99, 102, 241, 0.35);
+    color: #fff;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }

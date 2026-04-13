@@ -8,94 +8,155 @@ export default function Hero() {
   const isMobile = useIsMobile();
 
   const fadeUpVariants: Variants = {
-    hidden: { opacity: 0, y: isMobile ? 20 : 40 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.8, ease: "easeOut" } 
+    hidden: { opacity: 0, y: isMobile ? 16 : 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: [0.2, 0.65, 0.3, 0.9] },
     },
   };
 
+  const containerVariants: Variants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: isMobile ? 0.08 : 0.15 } },
+  };
+
+  const handleScrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <div className="relative flex-grow flex flex-col items-center justify-center w-full min-h-[85vh] px-4">
-      {/* Floating Animation Wrapper (Disabled on mobile to stop infinite repaints) */}
-      <motion.div 
-        animate={!isMobile ? { y: [0, -10, 0] } : { y: 0 }} 
-        transition={!isMobile ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
+    <div className="relative flex-grow flex flex-col items-center justify-center w-full min-h-[88vh] px-4">
+      {/* Subtle radial glow behind text — desktop only */}
+      {!isMobile && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[600px] h-[400px] bg-indigo-500/8 blur-[120px] rounded-full" />
+        </div>
+      )}
+
+      {/* Floating wrapper — desktop only */}
+      <motion.div
+        animate={!isMobile ? { y: [0, -8, 0] } : { y: 0 }}
+        transition={
+          !isMobile
+            ? { duration: 7, repeat: Infinity, ease: "easeInOut" }
+            : undefined
+        }
         className="flex flex-col items-center justify-center w-full relative z-10"
       >
         <motion.div
-           initial="hidden"
-           animate="visible"
-           transition={{ staggerChildren: isMobile ? 0.1 : 0.2 }}
-           className="flex flex-col items-center text-center space-y-6 sm:space-y-8 w-full max-w-5xl"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="flex flex-col items-center text-center w-full max-w-5xl gap-5 sm:gap-6"
         >
-          {/* Status Badge */}
-          <motion.div variants={fadeUpVariants} className="flex items-center justify-center gap-3 glass px-4 sm:px-5 py-2.5 rounded-full border border-white/5 bg-white/[0.02] shadow-[0_0_15px_rgba(255,255,255,0.02)]">
-            <span className="relative flex h-2.5 w-2.5">
-              {!isMobile && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>}
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+          {/* Availability badge */}
+          <motion.div
+            variants={fadeUpVariants}
+            className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md"
+          >
+            <span className="relative flex h-2 w-2">
+              {!isMobile && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+              )}
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="text-xs sm:text-sm font-medium tracking-wider text-neutral-300 uppercase">
-              Available for Opportunities
+            <span className="text-[11px] sm:text-xs font-semibold tracking-[0.15em] text-neutral-400 uppercase">
+              Open to opportunities
             </span>
           </motion.div>
-          
-          {/* Main Typography using structural clamp() scaling */}
-          <motion.div variants={fadeUpVariants} className="space-y-2 sm:space-y-4 w-full">
-            <h1 className="text-[clamp(2.5rem,8vw,8rem)] leading-none font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/10 pb-2 sm:pb-4">
+
+          {/* Name + Role */}
+          <motion.div variants={fadeUpVariants} className="space-y-2 sm:space-y-3 w-full">
+            <h1 className="text-[clamp(2.8rem,9vw,8.5rem)] leading-[0.92] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/95 to-white/20">
               RETHAN KUMAR
             </h1>
-            <p className="text-[clamp(1.5rem,4vw,3.5rem)] leading-tight font-medium text-neutral-300 tracking-tight">
-              Crafting <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Digital</span> Experiences.
-            </p>
-          </motion.div>
-
-          {/* Subtext */}
-          <motion.div variants={fadeUpVariants} className="max-w-2xl px-2 mt-4 sm:mt-2">
-            <p className="text-[clamp(1rem,2vw,1.25rem)] text-neutral-400/80 leading-relaxed font-light">
-              A visionary front-end engineer building premium, futuristic web applications. 
-              Fusing modern design systems with liquid motion to engineer the next generation of the web.
-            </p>
-          </motion.div>
-
-          {/* Call to Actions (100% width stacking natively on mobiles) */}
-          <motion.div variants={fadeUpVariants} className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full max-w-sm sm:max-w-none">
-            
-            {/* View Work CTA (Primary Liquid Glass) */}
-            <motion.button 
-              whileHover={!isMobile ? { scale: 1.05 } : undefined}
-              whileTap={{ scale: 0.95 }}
-              className="relative group flex items-center justify-center px-8 py-4 w-full sm:w-auto overflow-hidden active:scale-95 transition-transform"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full blur-xl opacity-40 group-hover:opacity-80 transition duration-500"></div>
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-md rounded-full border border-white/20 group-hover:border-white/50 transition-all duration-300"></div>
-              
-              <span className="relative text-white font-medium tracking-wide z-10 flex items-center gap-2">
-                View Work 
-                <svg className={cn("w-5 h-5 transition-transform duration-300", !isMobile && "group-hover:translate-x-1 group-hover:-translate-y-1")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+            <p className="text-[clamp(1.1rem,3vw,2.2rem)] leading-tight font-medium tracking-tight">
+              <span className="text-neutral-300">UI/UX Designer</span>
+              <span className="text-white/20 mx-3">·</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+                Front-End Engineer
               </span>
+            </p>
+          </motion.div>
+
+          {/* Subtext — specific, no buzzwords */}
+          <motion.div variants={fadeUpVariants} className="max-w-xl px-2">
+            <p className="text-[clamp(0.95rem,1.8vw,1.15rem)] text-neutral-500 leading-relaxed font-light">
+              I design and build fast, polished interfaces — from pixel-perfect
+              UI systems to production-ready React apps.
+            </p>
+          </motion.div>
+
+          {/* CTAs */}
+          <motion.div
+            variants={fadeUpVariants}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none pt-2"
+          >
+            {/* Primary */}
+            <motion.button
+              whileHover={!isMobile ? { scale: 1.04 } : undefined}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => handleScrollTo("projects")}
+              className="relative group flex items-center justify-center gap-2 px-7 py-3.5 w-full sm:w-auto rounded-full overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+              <span className="relative z-10 text-white font-semibold text-sm tracking-wide">
+                View My Work
+              </span>
+              <svg
+                className={cn(
+                  "relative z-10 w-4 h-4 text-white transition-transform duration-300",
+                  !isMobile && "group-hover:translate-x-0.5"
+                )}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M14 5l7 7-7 7M3 12h18"
+                />
+              </svg>
             </motion.button>
 
-            {/* Download Resume CTA (Secondary Dark Glass) */}
-            <motion.button 
-              whileHover={!isMobile ? { scale: 1.05 } : undefined}
-              whileTap={{ scale: 0.95 }}
-              className="relative group flex items-center justify-center px-8 py-4 w-full sm:w-auto active:scale-95 transition-transform"
+            {/* Secondary */}
+            <motion.button
+              whileHover={!isMobile ? { scale: 1.04 } : undefined}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => handleScrollTo("contact")}
+              className="relative group flex items-center justify-center gap-2 px-7 py-3.5 w-full sm:w-auto rounded-full bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-all duration-300"
             >
-              <div className="absolute inset-0 bg-white/[0.03] backdrop-blur-sm rounded-full border border-white/10 group-hover:bg-white/[0.08] transition-all duration-300"></div>
-              <span className="relative text-neutral-300 group-hover:text-white transition-colors duration-300 font-medium tracking-wide z-10 flex items-center gap-2">
-                Download Resume
-                <svg className="w-5 h-5 opacity-70 sm:opacity-50 sm:group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+              <span className="text-neutral-300 group-hover:text-white transition-colors duration-300 font-medium text-sm tracking-wide">
+                Get In Touch
               </span>
             </motion.button>
           </motion.div>
         </motion.div>
       </motion.div>
+
+      {/* Scroll indicator — desktop only, fades in after delay */}
+      {!isMobile && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.5, duration: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-neutral-600"
+        >
+          <span className="text-[10px] tracking-[0.2em] uppercase font-medium">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+            </svg>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
