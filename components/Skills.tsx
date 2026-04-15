@@ -166,11 +166,23 @@ export default function Skills() {
           >
             {/* Group label */}
             <motion.div variants={itemVariants} className="flex items-center gap-3">
-              <div className="h-px w-8 bg-white/10" />
+              <motion.div
+                className="h-px w-8 bg-white/10 origin-center"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
               <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-neutral-500">
                 {group.title}
               </span>
-              <div className="h-px w-8 bg-white/10" />
+              <motion.div
+                className="h-px w-8 bg-white/10 origin-center"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
             </motion.div>
 
             {/* Badges */}

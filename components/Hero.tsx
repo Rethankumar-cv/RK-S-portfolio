@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, useAnimation } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/lib/hooks";
 
 export default function Hero() {
   const isMobile = useIsMobile();
+  const shimmerControls = useAnimation();
 
   const fadeUpVariants: Variants = {
     hidden: { opacity: 0, y: isMobile ? 16 : 30 },
@@ -98,10 +99,23 @@ export default function Hero() {
               whileHover={!isMobile ? { scale: 1.04 } : undefined}
               whileTap={{ scale: 0.96 }}
               onClick={() => handleScrollTo("projects")}
+              onMouseEnter={() => {
+                if (isMobile) return;
+                shimmerControls.set({ x: "-110%" });
+                shimmerControls.start({ x: "110%", transition: { duration: 0.52, ease: "easeInOut" } });
+              }}
               className="relative group flex items-center justify-center gap-2 px-7 py-3.5 w-full sm:w-auto rounded-full overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+              {/* Shimmer sweep — desktop only */}
+              {!isMobile && (
+                <motion.div
+                  animate={shimmerControls}
+                  initial={{ x: "-110%" }}
+                  className="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-[1]"
+                />
+              )}
               <span className="relative z-10 text-white font-semibold text-sm tracking-wide">
                 View My Work
               </span>

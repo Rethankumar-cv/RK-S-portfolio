@@ -93,8 +93,15 @@ export default function Process() {
         viewport={{ once: true, margin: isMobile ? "-50px" : "-100px" }}
         className="relative max-w-4xl mx-auto px-4"
       >
-        {/* Line Track - Moved far left on mobile, centered on MD */}
-        <div className="absolute left-6 md:left-1/2 top-4 bottom-4 w-px bg-white/10 md:-translate-x-1/2 z-0" />
+        {/* Line Track — draws itself on scroll */}
+        <motion.div
+          className="absolute left-6 md:left-1/2 top-4 bottom-4 w-px bg-white/10 md:-translate-x-1/2 z-0"
+          style={{ transformOrigin: "top" }}
+          initial={{ scaleY: 0 }}
+          whileInView={{ scaleY: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: [0.2, 0.65, 0.3, 0.9], delay: 0.1 }}
+        />
 
         {PROCESS_STEPS.map((step, idx) => {
           const isEven = idx % 2 === 0;

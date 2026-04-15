@@ -1,9 +1,34 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, useInView } from "framer-motion";
 import { useIsMobile } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
+import { useRef, useState, useEffect } from "react";
 
+// ─── Count-up component ───────────────────────────────────────────────────────
+function CountUp({ end, suffix = "" }: { end: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let startTime: number | null = null;
+    const duration = 1000;
+    const tick = (ts: number) => {
+      if (!startTime) startTime = ts;
+      const p = Math.min((ts - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+      setCount(Math.floor(eased * end));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, end]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ─── Variants ─────────────────────────────────────────────────────────────────
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
@@ -13,6 +38,28 @@ const itemVariants: Variants = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.2, 0.65, 0.3, 0.9] } },
 };
+
+const certContainerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09 } },
+};
+
+const certItemVariants: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: "easeOut" } },
+};
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const METRICS = [
+  { end: 60, suffix: "%", label: "CLS improvement" },
+  { end: 3, suffix: "", label: "Teams using library" },
+];
+
+const CERTS = [
+  { name: "AWS Developer", org: "Amazon Web Services", color: "text-emerald-400" },
+  { name: "Meta Front-End Pro", org: "Coursera / Meta", color: "text-cyan-400" },
+  { name: "Google UX Design", org: "Coursera / Google", color: "text-yellow-400/80" },
+];
 
 export default function Experience() {
   const isMobile = useIsMobile();
@@ -63,7 +110,6 @@ export default function Experience() {
               isMobile && "active:border-indigo-500/30"
             )}
           >
-            {/* Background blob */}
             <div className="absolute -top-24 -right-24 w-56 h-56 bg-indigo-500/8 blur-3xl rounded-full pointer-events-none" />
 
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
@@ -82,24 +128,22 @@ export default function Experience() {
                   @ Acme Vanguard Tech
                 </p>
                 <p className="text-neutral-500 text-[13px] sm:text-sm leading-relaxed max-w-xl">
-                  Migrated legacy dashboard states into a unified React architecture. Improved Core Web Vitals CLS score by 60% and shipped a modular component library adopted by 3 internal teams.
+                  Migrated legacy dashboard states into a unified React architecture. Improved Core Web Vitals CLS score and shipped a modular component library adopted by 3 internal teams.
                 </p>
 
-                {/* Outcome metrics */}
-                <div className="flex flex-wrap gap-4 mt-4">
-                  {[
-                    { val: "60%", label: "CLS improvement" },
-                    { val: "3", label: "Teams using library" },
-                  ].map(({ val, label }) => (
+                {/* Outcome metrics — count up when in view */}
+                <div className="flex flex-wrap gap-6 mt-4">
+                  {METRICS.map(({ end, suffix, label }) => (
                     <div key={label}>
-                      <p className="text-base font-black text-white">{val}</p>
+                      <p className="text-base font-black text-white">
+                        <CountUp end={end} suffix={suffix} />
+                      </p>
                       <p className="text-[10px] text-neutral-600 uppercase tracking-wider">{label}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Icon */}
               <div className="hidden sm:flex w-16 h-16 shrink-0 rounded-2xl bg-white/[0.04] border border-white/[0.08] items-center justify-center">
                 <svg className="w-7 h-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -133,7 +177,6 @@ export default function Experience() {
             </div>
 
             <div className="space-y-5 flex-1">
-              {/* Winner */}
               <div className="relative pl-5 pb-5 border-l border-white/[0.07]">
                 <div className="absolute -left-[5px] top-[6px] w-2 h-2 rounded-full bg-fuchsia-400 shadow-[0_0_8px_rgba(232,121,249,0.7)]" />
                 <div className="flex items-center gap-2 mb-1">
@@ -146,7 +189,6 @@ export default function Experience() {
                 </p>
               </div>
 
-              {/* Finalist */}
               <div className="relative pl-5 border-l border-white/[0.07]">
                 <div className="absolute -left-[5px] top-[6px] w-2 h-2 rounded-full bg-neutral-700 group-hover:bg-fuchsia-400/50 transition-colors duration-300" />
                 <h4 className="text-sm font-bold text-white mb-1">Finalist — AI Design Jam</h4>
@@ -182,14 +224,18 @@ export default function Experience() {
               </span>
             </div>
 
-            <div className="flex flex-col gap-3 flex-1 justify-center">
-              {[
-                { name: "AWS Developer", org: "Amazon Web Services", color: "text-emerald-400" },
-                { name: "Meta Front-End Pro", org: "Coursera / Meta", color: "text-cyan-400" },
-                { name: "Google UX Design", org: "Coursera / Google", color: "text-yellow-400/80" },
-              ].map(({ name, org, color }) => (
-                <div
+            {/* Staggered cert rows */}
+            <motion.div
+              className="flex flex-col gap-3 flex-1 justify-center"
+              variants={certContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-30px" }}
+            >
+              {CERTS.map(({ name, org, color }) => (
+                <motion.div
                   key={name}
+                  variants={certItemVariants}
                   className="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05] group-hover:bg-white/[0.04] transition-colors duration-300"
                 >
                   <div className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center shrink-0">
@@ -201,9 +247,9 @@ export default function Experience() {
                     <p className="text-[13px] font-bold text-white leading-snug">{name}</p>
                     <p className="text-[11px] text-neutral-600 mt-0.5">{org}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </motion.div>

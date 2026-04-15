@@ -89,6 +89,17 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.2, 0.65, 0.3, 0.9] } },
 };
 
+// PSI row stagger — runs once per card when card enters view
+const psiContainerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const psiItemVariants: Variants = {
+  hidden: { opacity: 0, x: -6 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.28, ease: "easeOut" } },
+};
+
 // ─── Featured Card ────────────────────────────────────────────────────────────
 
 function FeaturedCard({
@@ -180,28 +191,34 @@ function FeaturedCard({
             </div>
           </div>
 
-          {/* PSI format */}
-          <div className="space-y-2.5 flex-1">
+          {/* PSI format — staggered reveal */}
+          <motion.div
+            className="space-y-2.5 flex-1"
+            variants={psiContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-30px" }}
+          >
             {[
               { label: "Problem", text: project.problem },
               { label: "Solution", text: project.solution },
               { label: "Impact", text: project.impact },
             ].map(({ label, text }) => (
-              <div key={label} className="flex gap-2.5">
+              <motion.div key={label} variants={psiItemVariants} className="flex gap-2.5">
                 <span className={cn("text-[10px] font-bold tracking-wider uppercase mt-[3px] w-14 shrink-0", project.accent)}>
                   {label}
                 </span>
                 <p className="text-[13px] sm:text-sm text-neutral-400 leading-snug">{text}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Tech tags */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {project.tech.map((t) => (
               <span
                 key={t}
-                className="px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase text-neutral-400 bg-white/[0.04] border border-white/[0.08] rounded-full"
+                className="px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase text-neutral-400 bg-white/[0.04] border border-white/[0.08] rounded-full hover:bg-white/[0.09] hover:border-white/[0.16] hover:text-neutral-300 transition-all duration-150 cursor-default"
               >
                 {t}
               </span>
