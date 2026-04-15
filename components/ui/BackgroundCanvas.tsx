@@ -3,15 +3,16 @@
 /**
  * BackgroundCanvas
  * ─────────────────────────────────────────────────────────────────────────────
- * Full-screen fixed background powered by the React Bits ColorBends WebGL shader.
- * Adapts intelligently across Mobile / Tablet / Desktop device tiers.
+ * Full-screen fixed background.
+ * Desktop: React Bits ColorBends WebGL shader.
+ * Mobile / WebGL Fallback: Layered premium CSS gradients.
  *
  * Layering:
  *   position: fixed | inset: 0 | z-index: -1
  *   pointer-events: none  →  never intercepts page interactions
  */
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useIsMobile, useIsTablet } from "@/lib/hooks";
 import ColorBends from "@/components/ui/ColorBends";
 
@@ -47,29 +48,30 @@ const TABLET = {
   autoRotate:     0.08,
 } as const;
 
-const MOBILE = {
-  ...DESKTOP,
-  mouseInfluence: 0,    // disabled — no cursor on touch devices
-  parallax:       0,    // disabled — prevents motion sickness / GPU waste
-  speed:          0.2,
-  intensity:      0.8,
-  scale:          1.2,
-  autoRotate:     0.06,
-  warpStrength:   0.5,  // lighter warp pass
-  noise:          0.05,
-} as const;
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function BackgroundCanvas() {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
+  const [hasWebGL, setHasWebGL] = useState(true);
+
+  // Check WebGL availability on mount
+  useEffect(() => {
+    try {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      if (!gl) setHasWebGL(false);
+    } catch {
+      setHasWebGL(false);
+    }
+  }, []);
 
   const config = useMemo(() => {
-    if (isMobile) return MOBILE;
     if (isTablet) return TABLET;
     return DESKTOP;
-  }, [isMobile, isTablet]);
+  }, [isTablet]);
+
+  const shouldFallback = isMobile || !hasWebGL;
 
   return (
     <div
@@ -77,15 +79,39 @@ export default function BackgroundCanvas() {
       style={{
         position: "fixed",
         inset: 0,
+        width: "100%",
+        minHeight: "100vh",
         zIndex: -1,
       }}
       aria-hidden="true"
     >
-      {/* ── WebGL Shader Layer ──────────────────────────────────────────── */}
-      <ColorBends {...config} className="absolute inset-0 w-full h-full" />
+      {shouldFallback ? (
+        /* ── Premium CSS Fallback ────────────────────────────────────────── */
+        <div
+          className="absolute inset-0 w-full h-full"
+          style={{
+            background: `
+              radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6)),
+              radial-gradient(circle at 20% 30%, rgba(99,102,241,0.25), transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(168,85,247,0.25), transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(34,211,238,0.15), transparent 70%),
+              linear-gradient(135deg, #030303, #050505, #030303)
+            `
+          }}
+        >
+          {/* Depth effect blur layer */}
+          <div className="absolute inset-0 backdrop-blur-[40px]" />
+        </div>
+      ) : (
+        /* ── WebGL Shader Layer ──────────────────────────────────────────── */
+        <ColorBends 
+          {...config} 
+          className="absolute inset-0 w-full h-full" 
+        />
+      )}
 
       {/*
-       * ── Readability Overlay ─────────────────────────────────────────────
+       * ── Readability Overlay (Always present) ────────────────────────────
        * Radial vignette darkens corners; linear wash ensures minimum
        * contrast floor for text and UI elements above the shader.
        */}

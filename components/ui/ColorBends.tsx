@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, CSSProperties } from "react";
+import { useEffect, useRef, useState, CSSProperties, ReactNode } from "react";
 import * as THREE from "three";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -8,6 +8,7 @@ const MAX_COLORS = 8;
 
 // ─── GLSL ─────────────────────────────────────────────────────────────────────
 const frag = `
+precision mediump float;
 #define MAX_COLORS ${MAX_COLORS}
 uniform vec2 uCanvas;
 uniform float uTime;
@@ -130,6 +131,7 @@ export interface ColorBendsProps {
   bandWidth?: number;
   /** Unused – kept for API compatibility */
   color?: string;
+  fallback?: ReactNode;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -161,8 +163,10 @@ export default function ColorBends({
   bandWidth = 6,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   color: _color,
+  fallback,
 }: ColorBendsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [hasWebGL, setHasWebGL] = useState(true);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const rafRef = useRef<number | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
@@ -177,6 +181,19 @@ export default function ColorBends({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    // WebGL fallback test
+    try {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      if (!gl) {
+        setHasWebGL(false);
+        return;
+      }
+    } catch (e) {
+      setHasWebGL(false);
+      return;
+    }
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -214,11 +231,19 @@ export default function ColorBends({
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: false,
-      powerPreference: "high-performance",
-      alpha: true,
-    });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        alpha: true,
+        // Removed high-performance powerPreference to fix mobile GPU crashes
+      });
+    } catch (e) {
+      console.warn("WebGL renderer creation failed", e);
+      setHasWebGL(false);
+      return;
+    }
+    
     rendererRef.current = renderer;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
@@ -282,6 +307,7 @@ export default function ColorBends({
 
   // ── Prop updates (hot-patch uniforms without recreating GL context) ─────────
   useEffect(() => {
+    if (!hasWebGL) return;
     const mat = materialRef.current;
     const rend = rendererRef.current;
     if (!mat) return;
@@ -316,6 +342,7 @@ export default function ColorBends({
 
   // ── Pointer tracking ────────────────────────────────────────────────────────
   useEffect(() => {
+    if (!hasWebGL) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -329,6 +356,14 @@ export default function ColorBends({
     container.addEventListener("pointermove", handlePointerMove);
     return () => container.removeEventListener("pointermove", handlePointerMove);
   }, []);
+
+  if (!hasWebGL) {
+      return (
+        <div className={`w-full h-full relative overflow-hidden ${className}`} style={style}>
+          {fallback}
+        </div>
+      );
+  }
 
   return (
     <div
