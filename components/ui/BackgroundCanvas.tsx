@@ -1,27 +1,12 @@
 "use client";
 
-/**
- * BackgroundCanvas
- * ─────────────────────────────────────────────────────────────────────────────
- * Full-screen fixed background.
- * Desktop: React Bits ColorBends WebGL shader.
- * Mobile / WebGL Fallback: Layered premium CSS gradients.
- *
- * Layering:
- *   position: fixed | inset: 0 | z-index: -1
- *   pointer-events: none  →  never intercepts page interactions
- */
-
-import { useMemo, useEffect, useState } from "react";
-import { useIsMobile, useIsTablet } from "@/lib/hooks";
+import { useEffect, useState } from "react";
 import ColorBends from "@/components/ui/ColorBends";
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
+// ─── Constants & Configs ──────────────────────────────────────────────────────
 const PALETTE = ["#ff5c7a", "#8a5cff", "#00ffd1"];
 
-// ─── Device configs ──────────────────────────────────────────────────────────
-
-const DESKTOP = {
+const DESKTOP_CONFIG = {
   colors:         PALETTE,
   rotation:       -7,
   speed:          0.46,
@@ -38,98 +23,84 @@ const DESKTOP = {
   autoRotate:     0,
 } as const;
 
-const TABLET = {
-  ...DESKTOP,
-  mouseInfluence: 0.3,
-  speed:          0.28,
-  scale:          1.4,
-  intensity:      0.9,
-  parallax:       0.15,
-  autoRotate:     0.08,
-} as const;
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
-// ─── Component ────────────────────────────────────────────────────────────────
+function FallbackBackground() {
+  return (
+    <div
+      className="absolute inset-0 w-full h-full"
+      style={{
+        // Ordered from top-layer to base-layer
+        background: "radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6)), radial-gradient(circle at 20% 30%, rgba(99,102,241,0.25), transparent 60%), radial-gradient(circle at 80% 70%, rgba(168,85,247,0.25), transparent 60%), radial-gradient(circle at 50% 50%, rgba(34,211,238,0.15), transparent 70%), linear-gradient(135deg, #030303, #050505, #030303)",
+      }}
+    >
+      {/* Depth effect blur layer */}
+      <div className="absolute inset-0 backdrop-blur-[40px]" />
+    </div>
+  );
+}
+
+// ─── Main System ──────────────────────────────────────────────────────────────
 
 export default function BackgroundCanvas() {
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
-  const [hasWebGL, setHasWebGL] = useState(true);
+  const [renderState, setRenderState] = useState<"loading" | "colorbends" | "fallback">("loading");
 
-  // Check WebGL availability on mount
   useEffect(() => {
+    // 1. Robust Device Check (Coarse pointer = Mobile/Touch)
+    const isMobile = window.matchMedia("(pointer: coarse)").matches;
+    
+    // 2. Strict WebGL Availability Check
+    let webglAvailable = false;
     try {
       const canvas = document.createElement("canvas");
-      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-      if (!gl) setHasWebGL(false);
+      webglAvailable = !!(
+        window.WebGLRenderingContext &&
+        (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+      );
     } catch {
-      setHasWebGL(false);
+      webglAvailable = false;
+    }
+
+    // 3. Render Rule (Same for all devices, only skip if WebGL fundamentally fails)
+    if (webglAvailable) {
+      setRenderState("colorbends");
+    } else {
+      setRenderState("fallback");
     }
   }, []);
 
-  const config = useMemo(() => {
-    if (isTablet) return TABLET;
-    return DESKTOP;
-  }, [isTablet]);
-
-  const shouldFallback = isMobile || !hasWebGL;
-
   return (
     <div
+      id="background-system-root"
       className="pointer-events-none overflow-hidden"
       style={{
         position: "fixed",
         inset: 0,
         width: "100%",
+        height: "100vh", // Strict guarantee for mobile sizing
         minHeight: "100vh",
         zIndex: -1,
       }}
       aria-hidden="true"
     >
-      {shouldFallback ? (
-        /* ── Premium CSS Fallback ────────────────────────────────────────── */
-        <div
-          className="absolute inset-0 w-full h-full"
-          style={{
-            background: `
-              radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6)),
-              radial-gradient(circle at 20% 30%, rgba(99,102,241,0.25), transparent 60%),
-              radial-gradient(circle at 80% 70%, rgba(168,85,247,0.25), transparent 60%),
-              radial-gradient(circle at 50% 50%, rgba(34,211,238,0.15), transparent 70%),
-              linear-gradient(135deg, #030303, #050505, #030303)
-            `
-          }}
-        >
-          {/* Depth effect blur layer */}
-          <div className="absolute inset-0 backdrop-blur-[40px]" />
-        </div>
+      {/* ── Content Layer ── */}
+      {renderState === "loading" ? (
+        <FallbackBackground /> // Show safe fallback immediately to avoid blank flashes
+      ) : renderState === "colorbends" ? (
+        <ColorBends {...DESKTOP_CONFIG} className="absolute inset-0 w-full h-full" />
       ) : (
-        /* ── WebGL Shader Layer ──────────────────────────────────────────── */
-        <ColorBends 
-          {...config} 
-          className="absolute inset-0 w-full h-full" 
-        />
+        <FallbackBackground />
       )}
 
-      {/*
-       * ── Readability Overlay (Always present) ────────────────────────────
-       * Radial vignette darkens corners; linear wash ensures minimum
-       * contrast floor for text and UI elements above the shader.
-       */}
+      {/* ── Global Overlays ── */}
+      {/* Readability Overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: [
-            "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(3,3,3,0.60) 100%)",
-            "linear-gradient(180deg, rgba(3,3,3,0.20) 0%, rgba(3,3,3,0.08) 50%, rgba(3,3,3,0.25) 100%)",
-          ].join(", "),
+          background: "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(3,3,3,0.60) 100%), linear-gradient(180deg, rgba(3,3,3,0.20) 0%, rgba(3,3,3,0.08) 50%, rgba(3,3,3,0.25) 100%)",
         }}
       />
-
-      {/*
-       * ── Film Grain ──────────────────────────────────────────────────────
-       * SVG fractal noise data-URI — adds premium micro-texture.
-       * Opacity intentionally low; felt, not seen.
-       */}
+      {/* Noise Texture */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.025] mix-blend-screen"
         style={{
