@@ -1,55 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ColorBends from "@/components/ui/ColorBends";
+import AmbientBackground from "@/components/ui/glass/AmbientBackground";
+import { useIsMobile } from "@/lib/hooks";
 
 // ─── Constants & Configs ──────────────────────────────────────────────────────
-const PALETTE = ["#ff5c7a", "#8a5cff", "#00ffd1"];
+const PALETTE = ["#6366f1", "#8b5cf6", "#06b6d4"];
 
-const DESKTOP_CONFIG = {
+const BASE_CONFIG = {
   colors:         PALETTE,
   rotation:       -7,
-  speed:          0.46,
-  scale:          1.8,
+  speed:          0.05, // Slower float
+  scale:          1.5,
   frequency:      1,
   warpStrength:   1,
-  mouseInfluence: 1.05,
-  noise:          0.15,
-  parallax:       0.5,
-  iterations:     1,
-  intensity:      1.1,
-  bandWidth:      7,
+  noise:          0.10,
+  intensity:      1.0,
+  bandWidth:      5,
   transparent:    true,
   autoRotate:     0,
 } as const;
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+const DESKTOP_CONFIG = {
+  ...BASE_CONFIG,
+  mouseInfluence: 1.05,
+  parallax:       0.5,
+  iterations:     2,
+};
 
-function FallbackBackground() {
-  return (
-    <div
-      className="absolute inset-0 w-full h-full"
-      style={{
-        // Ordered from top-layer to base-layer
-        background: "radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6)), radial-gradient(circle at 20% 30%, rgba(99,102,241,0.25), transparent 60%), radial-gradient(circle at 80% 70%, rgba(168,85,247,0.25), transparent 60%), radial-gradient(circle at 50% 50%, rgba(34,211,238,0.15), transparent 70%), linear-gradient(135deg, #030303, #050505, #030303)",
-      }}
-    >
-      {/* Depth effect blur layer */}
-      <div className="absolute inset-0 backdrop-blur-[40px]" />
-    </div>
-  );
-}
-
-// ─── Main System ──────────────────────────────────────────────────────────────
+const MOBILE_CONFIG = {
+  ...BASE_CONFIG,
+  mouseInfluence: 0,
+  parallax:       0,
+  iterations:     1, // Reduced logic on mobile
+};
 
 export default function BackgroundCanvas() {
   const [renderState, setRenderState] = useState<"loading" | "colorbends" | "fallback">("loading");
+  const isMobile = useIsMobile();
+
+  const config = useMemo(() => {
+    return isMobile ? MOBILE_CONFIG : DESKTOP_CONFIG;
+  }, [isMobile]);
 
   useEffect(() => {
-    // 1. Robust Device Check (Coarse pointer = Mobile/Touch)
-    const isMobile = window.matchMedia("(pointer: coarse)").matches;
-    
-    // 2. Strict WebGL Availability Check
+    // Strict WebGL Availability Check
     let webglAvailable = false;
     try {
       const canvas = document.createElement("canvas");
@@ -61,7 +57,6 @@ export default function BackgroundCanvas() {
       webglAvailable = false;
     }
 
-    // 3. Render Rule (Same for all devices, only skip if WebGL fundamentally fails)
     if (webglAvailable) {
       setRenderState("colorbends");
     } else {
@@ -72,12 +67,12 @@ export default function BackgroundCanvas() {
   return (
     <div
       id="background-system-root"
-      className="pointer-events-none overflow-hidden"
+      className="pointer-events-none overflow-hidden bg-[#0a0a0f]"
       style={{
         position: "fixed",
         inset: 0,
         width: "100%",
-        height: "100vh", // Strict guarantee for mobile sizing
+        height: "100vh",
         minHeight: "100vh",
         zIndex: -1,
       }}
@@ -85,24 +80,19 @@ export default function BackgroundCanvas() {
     >
       {/* ── Content Layer ── */}
       {renderState === "loading" ? (
-        <FallbackBackground /> // Show safe fallback immediately to avoid blank flashes
+        <AmbientBackground />
       ) : renderState === "colorbends" ? (
-        <ColorBends {...DESKTOP_CONFIG} className="absolute inset-0 w-full h-full" />
+        <div className="absolute inset-0 opacity-[0.20] mix-blend-screen">
+          <ColorBends {...config} className="absolute inset-0 w-full h-full" />
+        </div>
       ) : (
-        <FallbackBackground />
+        <AmbientBackground />
       )}
 
       {/* ── Global Overlays ── */}
-      {/* Readability Overlay */}
+      {/* Film Grain */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(3,3,3,0.60) 100%), linear-gradient(180deg, rgba(3,3,3,0.20) 0%, rgba(3,3,3,0.08) 50%, rgba(3,3,3,0.25) 100%)",
-        }}
-      />
-      {/* Noise Texture */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.025] mix-blend-screen"
+        className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-screen"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E")`,
           backgroundRepeat: "repeat",

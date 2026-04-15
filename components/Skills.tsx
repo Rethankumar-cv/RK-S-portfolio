@@ -1,215 +1,120 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, Variants } from "framer-motion";
-import { useRef } from "react";
+import { motion, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/lib/hooks";
+import GlassPill from "@/components/ui/glass/GlassPill";
+import GlassCard from "@/components/ui/glass/GlassCard";
 
 const SKILL_GROUPS = [
   {
-    title: "Design & UX",
-    color: "from-fuchsia-500/50 to-pink-500/50",
-    accent: "#e879f9",
-    skills: [
-      { name: "Figma", key: true },
-      { name: "Framer", key: true },
-      { name: "Prototyping" },
-      { name: "Design Systems", key: true },
-      { name: "UI Animation" },
-      { name: "Wireframing" },
-    ],
+    category: "Design",
+    tint: "indigo" as const,
+    skills: ["Figma", "Framer", "Prototyping", "Design Systems", "UI Animation", "Wireframing"],
   },
   {
-    title: "Front-End",
-    color: "from-cyan-500/50 to-indigo-500/50",
-    accent: "#22d3ee",
-    skills: [
-      { name: "React", key: true },
-      { name: "Next.js", key: true },
-      { name: "TypeScript", key: true },
-      { name: "Tailwind CSS" },
-      { name: "Framer Motion" },
-      { name: "HTML / CSS" },
-    ],
+    category: "Front-End",
+    tint: "cyan" as const,
+    skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "GSAP", "Three.js"],
   },
   {
-    title: "Tools",
-    color: "from-emerald-500/50 to-teal-500/50",
-    accent: "#10b981",
-    skills: [
-      { name: "Git", key: true },
-      { name: "Vercel" },
-      { name: "GSAP" },
-      { name: "Storybook" },
-      { name: "Webpack" },
-      { name: "Docker" },
-    ],
+    category: "Engineering",
+    tint: "violet" as const,
+    skills: ["Node.js", "GraphQL", "PostgreSQL", "Prisma", "Go", "Docker", "Git"],
   },
 ];
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  visible: { 
+    opacity: 1,
+    transition: { staggerChildren: 0.1 } 
+  },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { 
+    opacity: 1, scale: 1,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+  },
 };
-
-function MagneticBadge({
-  skill,
-  color,
-  isMobile,
-}: {
-  skill: { name: string; key?: boolean };
-  color: string;
-  isMobile: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 140, damping: 14, mass: 0.1 });
-  const springY = useSpring(y, { stiffness: 140, damping: 14, mass: 0.1 });
-
-  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return;
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - left - width / 2) * 0.25);
-    y.set((e.clientY - top - height / 2) * 0.25);
-  };
-
-  const onMouseLeave = () => {
-    if (isMobile) return;
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-      style={!isMobile ? { x: springX, y: springY } : undefined}
-      whileHover={!isMobile ? { scale: 1.08 } : undefined}
-      whileTap={{ scale: 0.94 }}
-      className="relative group"
-    >
-      <div
-        className={cn(
-          "relative px-4 sm:px-5 py-2 sm:py-2.5 rounded-full cursor-default border transition-all duration-300 flex items-center gap-2 overflow-hidden",
-          skill.key
-            ? "bg-white/[0.07] border-white/[0.14]"
-            : "bg-white/[0.03] border-white/[0.07]"
-        )}
-      >
-        {/* Hover glow */}
-        {!isMobile && (
-          <div
-            className={cn(
-              "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 rounded-full mix-blend-screen blur-sm",
-              `bg-gradient-to-r ${color}`
-            )}
-          />
-        )}
-
-        {/* Key skill indicator dot */}
-        {skill.key && (
-          <span className="relative z-10 w-1.5 h-1.5 rounded-full bg-white/40 shrink-0" />
-        )}
-
-        <span className="relative z-10 text-[11px] sm:text-xs font-semibold tracking-[0.12em] uppercase text-neutral-400 group-hover:text-neutral-200 transition-colors duration-300">
-          {skill.name}
-        </span>
-      </div>
-    </motion.div>
-  );
-}
 
 export default function Skills() {
   const isMobile = useIsMobile();
 
   return (
-    <div className="w-full px-2 sm:px-0">
-      <div className="text-center mb-10 sm:mb-14">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <p className="text-[10px] sm:text-xs font-bold tracking-[0.18em] text-indigo-400 uppercase mb-3">
-            Capabilities
-          </p>
-          <h2 className="text-[clamp(2.2rem,5vw,3.8rem)] font-bold text-white tracking-tight leading-tight">
-            Technical{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-300 to-neutral-600">
-              Arsenal
-            </span>
-          </h2>
-          <p className="text-[14px] text-neutral-500 font-light mt-3">
-            Core skills I use on every project.{" "}
-            <span className="text-neutral-600">· = primary</span>
-          </p>
-        </motion.div>
+    <div className="w-full">
+      <div className="text-center mb-16 px-4">
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           whileInView={{ opacity: 1, y: 0 }}
+           viewport={{ once: true }}
+           transition={{ duration: 0.8 }}
+         >
+            <p className="text-xs font-bold tracking-[0.3em] text-indigo-400 uppercase mb-4">Capabilities</p>
+            <h2 className="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white tracking-tight leading-tight">
+              Modular <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-300 to-neutral-600">Expertise.</span>
+            </h2>
+         </motion.div>
       </div>
 
-      <div className="flex flex-col gap-10 sm:gap-12">
-        {SKILL_GROUPS.map((group) => (
-          <motion.div
-            key={group.title}
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="flex flex-col items-center gap-5"
-          >
-            {/* Group label */}
-            <motion.div variants={itemVariants} className="flex items-center gap-3">
-              <motion.div
-                className="h-px w-8 bg-white/10 origin-center"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-              />
-              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-neutral-500">
-                {group.title}
-              </span>
-              <motion.div
-                className="h-px w-8 bg-white/10 origin-center"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-              />
-            </motion.div>
-
-            {/* Badges */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-2.5 max-w-2xl">
-              {group.skills.map((skill, skillIdx) => (
-                <motion.div key={skill.name} variants={itemVariants}>
-                  <motion.div
-                    animate={!isMobile ? { y: [0, -5, 0] } : { y: 0 }}
-                    transition={
-                      !isMobile
-                        ? {
-                            duration: 4 + (skillIdx % 3) * 0.8,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: (skillIdx % 4) * 0.3,
-                          }
-                        : undefined
-                    }
-                  >
-                    <MagneticBadge skill={skill} color={group.color} isMobile={isMobile} />
-                  </motion.div>
-                </motion.div>
-              ))}
+      <motion.div 
+        className="max-w-6xl mx-auto px-4"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {SKILL_GROUPS.map((group) => (
+            <div key={group.category} className="space-y-6">
+               <motion.h4 
+                 variants={itemVariants}
+                 className="text-[10px] uppercase font-bold tracking-[0.3em] text-neutral-500 pl-4 border-l border-white/10"
+               >
+                 {group.category}
+               </motion.h4>
+               
+               <div className="flex flex-wrap gap-2.5">
+                  {group.skills.map((skill, idx) => (
+                    <motion.div
+                      key={skill}
+                      variants={itemVariants}
+                      whileHover={{ y: -2 }}
+                    >
+                       <GlassPill 
+                         variant="frosted" 
+                         className="px-5 py-2.5 bg-white/[0.03] border-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all lowercase"
+                         interactive
+                       >
+                          <div className={cn("w-1.5 h-1.5 rounded-full mr-3 shadow-[0_0_8px_currentColor]", 
+                            group.tint === "indigo" ? "text-indigo-400 bg-indigo-400" : 
+                            group.tint === "cyan" ? "text-cyan-400 bg-cyan-400" : 
+                            "text-violet-400 bg-violet-400"
+                          )} />
+                          {skill}
+                       </GlassPill>
+                    </motion.div>
+                  ))}
+               </div>
             </div>
-          </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
+
+        {/* Floating Tooltip / Note */}
+        <motion.div 
+          variants={itemVariants}
+          className="mt-20 flex justify-center"
+        >
+           <GlassCard variant="ultra" className="px-8 py-4 rounded-2xl border-white/10 flex items-center gap-4">
+              <span className="text-xl">✨</span>
+              <p className="text-[13px] text-neutral-400 font-light">
+                Constantly evolving. Currently exploring <span className="text-white font-medium">Native Spatial Design</span> patterns.
+              </p>
+           </GlassCard>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

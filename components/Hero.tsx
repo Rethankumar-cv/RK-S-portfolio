@@ -1,25 +1,29 @@
 "use client";
 
-import { motion, Variants, useAnimation } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/lib/hooks";
+import GlassPill from "@/components/ui/glass/GlassPill";
+import GlassButton from "@/components/ui/glass/GlassButton";
 
 export default function Hero() {
-  const isMobile = useIsMobile();
-  const shimmerControls = useAnimation();
-
-  const fadeUpVariants: Variants = {
-    hidden: { opacity: 0, y: isMobile ? 16 : 30 },
-    visible: {
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { 
       opacity: 1,
-      y: 0,
-      transition: { duration: 0.7, ease: [0.2, 0.65, 0.3, 0.9] },
+      transition: { 
+        staggerChildren: 0.15,
+        delayChildren: 0.5 
+      } 
     },
   };
 
-  const containerVariants: Variants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: isMobile ? 0.08 : 0.15 } },
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    },
   };
 
   const handleScrollTo = (id: string) => {
@@ -27,150 +31,107 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative flex-grow flex flex-col items-center justify-center w-full min-h-[88vh] px-4">
-      {/* Subtle radial glow behind text — desktop only */}
-      {!isMobile && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[600px] h-[400px] bg-indigo-500/8 blur-[120px] rounded-full" />
-        </div>
-      )}
-
-      {/* Floating wrapper — desktop only */}
+    <div className="relative flex flex-col items-center justify-center w-full min-h-screen px-4 py-32 sm:py-0 overflow-hidden">
       <motion.div
-        animate={!isMobile ? { y: [0, -8, 0] } : { y: 0 }}
-        transition={
-          !isMobile
-            ? { duration: 7, repeat: Infinity, ease: "easeInOut" }
-            : undefined
-        }
-        className="flex flex-col items-center justify-center w-full relative z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col items-center text-center w-full max-w-6xl relative z-20"
       >
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="flex flex-col items-center text-center w-full max-w-5xl gap-5 sm:gap-6"
-        >
-          {/* Availability badge */}
-          <motion.div
-            variants={fadeUpVariants}
-            className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-md"
+        {/* Availability Badge */}
+        <motion.div variants={itemVariants} className="mb-8">
+          <GlassPill 
+            variant="ultra"
+            className="flex items-center gap-3 px-6 py-2 border border-white/10"
           >
             <span className="relative flex h-2 w-2">
-              {!isMobile && (
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-              )}
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="text-[11px] sm:text-xs font-semibold tracking-[0.15em] text-neutral-400 uppercase">
-              Open to opportunities
+            <span className="text-white/60 tracking-[0.2em]">Open to opportunities</span>
+          </GlassPill>
+        </motion.div>
+
+        {/* Main Heading with Shimmer */}
+        <motion.div variants={itemVariants} className="mb-6">
+          <h1 className="text-[clamp(3.5rem,10vw,9rem)] leading-[0.85] font-black tracking-tighter select-none">
+            <span className="text-transparent bg-clip-text bg-[length:200%_auto] bg-gradient-to-r from-white via-white/80 to-white animate-shimmer">
+              RETHAN
             </span>
-          </motion.div>
+            <br />
+            <span className="text-transparent bg-clip-text bg-[length:200%_auto] bg-gradient-to-r from-white via-indigo-300 to-white animate-shimmer [animation-delay:0.5s]">
+              KUMAR
+            </span>
+          </h1>
+        </motion.div>
 
-          {/* Name + Role */}
-          <motion.div variants={fadeUpVariants} className="space-y-2 sm:space-y-3 w-full">
-            <h1 className="text-[clamp(2.8rem,9vw,8.5rem)] leading-[0.92] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/95 to-white/20">
-              RETHAN KUMAR
-            </h1>
-            <p className="text-[clamp(1.1rem,3vw,2.2rem)] leading-tight font-medium tracking-tight">
-              <span className="text-neutral-300">UI/UX Designer</span>
-              <span className="text-white/20 mx-3">·</span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
-                Front-End Engineer
-              </span>
-            </p>
-          </motion.div>
+        {/* Subtitle Pill with Prismatic Border */}
+        <motion.div variants={itemVariants} className="mb-10">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full blur-[2px] opacity-40 group-hover:opacity-60 transition-opacity" />
+            <div className="relative glass-medium px-8 py-3 rounded-full flex items-center gap-4 border-l-[3px] border-l-indigo-500">
+               <p className="text-[clamp(1rem,2vw,1.5rem)] font-medium tracking-tight text-neutral-300">
+                  UI/UX Designer <span className="text-white/20 mx-2">·</span> Front-End Engineer
+               </p>
+            </div>
+          </div>
+        </motion.div>
 
-          {/* Subtext — specific, no buzzwords */}
-          <motion.div variants={fadeUpVariants} className="max-w-xl px-2">
-            <p className="text-[clamp(0.95rem,1.8vw,1.15rem)] text-neutral-500 leading-relaxed font-light">
-              I design and build fast, polished interfaces — from pixel-perfect
-              UI systems to production-ready React apps.
-            </p>
-          </motion.div>
+        {/* Max-width subtext */}
+        <motion.div variants={itemVariants} className="max-w-2xl mb-12">
+          <p className="text-lg text-neutral-500 font-light leading-relaxed">
+            I craft high-fidelity, high-performance digital experiences that feel like the future. 
+            Blending technical rigor with liquid aesthetics.
+          </p>
+        </motion.div>
 
-          {/* CTAs */}
-          <motion.div
-            variants={fadeUpVariants}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none pt-2"
+        {/* Action Buttons */}
+        <motion.div 
+          variants={itemVariants} 
+          className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full"
+        >
+          <GlassButton 
+            variant="frosted" 
+            tint="indigo" 
+            className="w-full sm:w-auto"
+            onClick={() => handleScrollTo("projects")}
           >
-            {/* Primary */}
-            <motion.button
-              whileHover={!isMobile ? { scale: 1.04 } : undefined}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => handleScrollTo("projects")}
-              onMouseEnter={() => {
-                if (isMobile) return;
-                shimmerControls.set({ x: "-110%" });
-                shimmerControls.start({ x: "110%", transition: { duration: 0.52, ease: "easeInOut" } });
-              }}
-              className="relative group flex items-center justify-center gap-2 px-7 py-3.5 w-full sm:w-auto rounded-full overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
-              {/* Shimmer sweep — desktop only */}
-              {!isMobile && (
-                <motion.div
-                  animate={shimmerControls}
-                  initial={{ x: "-110%" }}
-                  className="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-[1]"
-                />
-              )}
-              <span className="relative z-10 text-white font-semibold text-sm tracking-wide">
-                View My Work
-              </span>
-              <svg
-                className={cn(
-                  "relative z-10 w-4 h-4 text-white transition-transform duration-300",
-                  !isMobile && "group-hover:translate-x-0.5"
-                )}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M14 5l7 7-7 7M3 12h18"
-                />
-              </svg>
-            </motion.button>
-
-            {/* Secondary */}
-            <motion.button
-              whileHover={!isMobile ? { scale: 1.04 } : undefined}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => handleScrollTo("contact")}
-              className="relative group flex items-center justify-center gap-2 px-7 py-3.5 w-full sm:w-auto rounded-full bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-all duration-300"
-            >
-              <span className="text-neutral-300 group-hover:text-white transition-colors duration-300 font-medium text-sm tracking-wide">
-                Get In Touch
-              </span>
-            </motion.button>
-          </motion.div>
+            Explore Projects
+            <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7-7 7M3 12h18" />
+            </svg>
+          </GlassButton>
+          
+          <GlassButton 
+            variant="ultra" 
+            className="w-full sm:w-auto border-white/10"
+            onClick={() => handleScrollTo("contact")}
+          >
+            Start a Conversation
+          </GlassButton>
         </motion.div>
       </motion.div>
 
-      {/* Scroll indicator — desktop only, fades in after delay */}
-      {!isMobile && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-neutral-600"
-        >
-          <span className="text-[10px] tracking-[0.2em] uppercase font-medium">Scroll</span>
+      {/* Scroll indicator with glass backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.5, duration: 1 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20 cursor-pointer group"
+        onClick={() => handleScrollTo("about")}
+      >
+        <span className="text-[10px] tracking-[0.3em] uppercase font-bold text-neutral-600 group-hover:text-indigo-400 transition-colors">Scroll</span>
+        <div className="w-10 h-10 rounded-full glass-ultra flex items-center justify-center border border-white/10 group-hover:border-indigo-500/30 transition-all">
           <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+            <svg className="w-4 h-4 text-neutral-500 group-hover:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </motion.div>
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
     </div>
   );
 }
