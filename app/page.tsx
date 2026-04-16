@@ -8,41 +8,39 @@ import Contact from "@/components/Contact";
 
 export default function Home() {
   return (
-    <main className="flex-grow flex flex-col w-full relative">
+    <main className="flex-grow flex flex-col w-full">
       {/* Introduction Space */}
-      <section id="home" className="flex flex-col items-center justify-center min-h-[95vh]">
+      <section id="home" className="flex flex-col items-center justify-center min-h-[90vh]">
         <Hero />
       </section>
 
-      {/* Spacing and Section Continuity is handled by the high-fidelity headers within components */}
-      
       {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center justify-center py-24 md:py-40">
+      <section id="about" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <About />
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="min-h-screen flex items-center justify-center py-24 md:py-40">
+      <section id="projects" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <Projects />
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="min-h-screen flex items-center justify-center py-24 md:py-40">
+      <section id="skills" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <Skills />
       </section>
 
       {/* Process Section */}
-      <section id="process" className="min-h-screen flex items-center justify-center py-24 md:py-40">
+      <section id="process" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <Process />
       </section>
       
       {/* Experience Section */}
-      <section id="experience" className="min-h-screen flex items-center justify-center py-24 md:py-40">
+      <section id="experience" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <Experience />
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="min-h-screen flex items-center justify-center pt-24 md:pt-40">
+      <section id="contact" className="min-h-screen flex items-center justify-center py-16 md:py-32">
         <Contact />
       </section>
     </main>

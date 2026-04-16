@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import GlassPill from "@/components/ui/glass/GlassPill";
 
 const NAV_LINKS = [
   { name: "About", href: "#about" },
@@ -15,17 +14,26 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const { scrollY } = useScroll();
 
-  // Dynamic glass values based on scroll
-  const blurValue = useTransform(scrollY, [0, 100], [20, 40]);
-  const opacityValue = useTransform(scrollY, [0, 100], [0.03, 0.05]);
-  const saturateValue = useTransform(scrollY, [0, 100], [150, 180]);
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+
       const sectionIds = NAV_LINKS.map((l) => l.href.replace("#", ""));
       let current = "";
 
@@ -60,22 +68,20 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-[60] flex justify-center mt-6 px-4 pointer-events-none"
+        className="fixed top-0 left-0 right-0 z-[60] flex justify-center mt-4 sm:mt-5 px-4 pointer-events-none"
       >
-        <motion.div
-          style={{
-            backdropFilter: useTransform(blurValue, (v) => `blur(${v}px) saturate(${saturateValue}%)`),
-            backgroundColor: useTransform(opacityValue, (v) => `rgba(255, 255, 255, ${v})`),
-          }}
-          className="pointer-events-auto flex items-center justify-between px-6 py-2 rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] w-full max-w-[600px] relative"
+        <div
+          className={cn(
+            "pointer-events-auto flex items-center justify-between px-5 py-2.5 rounded-full transition-all duration-500",
+            scrolled
+              ? "bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.5)] w-full max-w-2xl"
+              : "bg-white/[0.03] backdrop-blur-md border border-white/[0.06] w-full max-w-3xl"
+          )}
         >
-          {/* Top specular edge */}
-          <div className="absolute inset-x-4 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
-
-          {/* Logo / Home */}
+          {/* Logo */}
           <a
             href="#"
-            className="text-lg font-black tracking-tighter text-white hover:opacity-75 transition-opacity z-50 px-2"
+            className="text-base sm:text-lg font-black tracking-tighter text-white hover:opacity-75 transition-opacity z-50 px-1"
             onClick={(e) => {
               e.preventDefault();
               setMenuOpen(false);
@@ -85,9 +91,9 @@ export default function Navbar() {
             RK<span className="text-indigo-400">.</span>
           </a>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.slice(0, 5).map((link) => {
+          {/* Desktop nav — show only core 4 links */}
+          <nav className="hidden md:flex items-center gap-0.5">
+            {NAV_LINKS.slice(0, 4).map((link) => {
               const isActive = activeSection === link.href.replace("#", "");
               return (
                 <a
@@ -95,14 +101,14 @@ export default function Navbar() {
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
                   className={cn(
-                    "relative px-4 py-1.5 text-[12px] font-bold tracking-widest uppercase transition-all duration-300 rounded-full group",
+                    "relative px-4 py-1.5 text-[13px] font-medium transition-all duration-200 rounded-full group",
                     isActive ? "text-white" : "text-neutral-500 hover:text-neutral-200"
                   )}
                 >
                   {isActive && (
                     <motion.div
-                      layoutId="nav-highlight"
-                      className="absolute inset-0 bg-white/10 border border-white/10 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-white/[0.08] border border-white/[0.06] rounded-full"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                     />
                   )}
@@ -112,21 +118,17 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* "Open to opportunities" badge (Desktop) or contact link */}
-          <div className="hidden md:flex items-center ml-2">
-             <GlassPill 
-               interactive 
-               tint="emerald" 
-               className="cursor-pointer"
-               onClick={(e: any) => handleLinkClick(e as any, "#contact")}
-             >
-                <span className="relative flex h-2 w-2 mr-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                </span>
-                Now Available
-             </GlassPill>
-          </div>
+          {/* Desktop CTA */}
+          <a
+            href="#contact"
+            onClick={(e) => handleLinkClick(e, "#contact")}
+            className="hidden md:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/[0.15] transition-all duration-200 text-[13px] font-medium text-neutral-300 hover:text-white"
+          >
+            Contact
+            <svg className="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7" />
+            </svg>
+          </a>
 
           {/* Mobile hamburger */}
           <button
@@ -135,68 +137,85 @@ export default function Navbar() {
             aria-label="Toggle Navigation"
           >
             <div className="w-5 h-4 flex flex-col justify-between">
-              <span className={cn("w-full h-[1.5px] bg-current transform transition-all duration-300 origin-left", menuOpen ? "rotate-45 translate-y-[-0.5px]" : "")} />
-              <span className={cn("w-full h-[1.5px] bg-current transition-all duration-200", menuOpen ? "opacity-0 translate-x-2" : "")} />
-              <span className={cn("w-full h-[1.5px] bg-current transform transition-all duration-300 origin-left", menuOpen ? "-rotate-45 translate-y-[0.5px]" : "")} />
+              <span
+                className={cn(
+                  "w-full h-[1.5px] bg-current transform transition-all duration-300 origin-left",
+                  menuOpen ? "rotate-45 translate-y-[-0.5px]" : ""
+                )}
+              />
+              <span
+                className={cn(
+                  "w-full h-[1.5px] bg-current transition-all duration-200",
+                  menuOpen ? "opacity-0 translate-x-2" : ""
+                )}
+              />
+              <span
+                className={cn(
+                  "w-full h-[1.5px] bg-current transform transition-all duration-300 origin-left",
+                  menuOpen ? "-rotate-45 translate-y-[0.5px]" : ""
+                )}
+              />
             </div>
           </button>
-        </motion.div>
+        </div>
       </motion.header>
 
-      {/* Mobile drawer (Redesigned with glass-ultra) */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {menuOpen && (
           <>
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55] md:hidden"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[55] md:hidden"
             />
 
+            {/* Drawer panel */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-[100dvh] w-[80vw] glass-ultra border-l border-white/10 z-[58] md:hidden flex flex-col pt-32 pb-10 px-8"
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              className="fixed top-0 right-0 h-[100dvh] w-[78vw] max-w-xs bg-[#080808]/98 backdrop-blur-2xl border-l border-white/[0.07] z-[58] md:hidden flex flex-col pt-24 pb-10 px-7"
             >
-              <nav className="flex flex-col gap-2 flex-1">
+              <nav className="flex flex-col gap-1 flex-1">
                 {NAV_LINKS.map((link, i) => {
                   const isActive = activeSection === link.href.replace("#", "");
                   return (
                     <motion.a
                       key={link.name}
                       href={link.href}
-                      initial={{ opacity: 0, x: 20 }}
+                      initial={{ opacity: 0, x: 16 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05, duration: 0.4 }}
+                      transition={{ delay: i * 0.06 + 0.05, duration: 0.35 }}
                       onClick={(e) => handleLinkClick(e, link.href)}
                       className={cn(
-                        "flex items-center justify-between py-4 px-5 rounded-2xl text-lg font-bold tracking-tight transition-all",
+                        "flex items-center justify-between py-3.5 px-4 rounded-xl text-lg font-semibold tracking-tight transition-colors",
                         isActive
-                          ? "text-white bg-white/10 border border-white/10"
-                          : "text-neutral-400 active:bg-white/5 active:text-white"
+                          ? "text-white bg-white/[0.06] border border-white/[0.08]"
+                          : "text-neutral-400 active:text-white active:bg-white/[0.04]"
                       )}
                     >
                       {link.name}
                       {isActive && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                        <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
                       )}
                     </motion.a>
                   );
                 })}
               </nav>
 
-              <div className="border-t border-white/5 pt-8 mt-4">
-                <p className="text-[10px] text-neutral-600 font-bold tracking-[0.2em] uppercase mb-1">
-                  Connect
+              {/* Drawer footer */}
+              <div className="border-t border-white/[0.06] pt-6 mt-4">
+                <p className="text-[11px] text-neutral-600 font-medium tracking-[0.15em] uppercase">
+                  Rethan Kumar · Portfolio
                 </p>
-                <div className="flex gap-4">
-                  <a href="#" className="text-white/40 hover:text-white transition-colors uppercase text-[11px] font-bold tracking-wider">GitHub</a>
-                  <a href="#" className="text-white/40 hover:text-white transition-colors uppercase text-[11px] font-bold tracking-wider">LinkedIn</a>
-                </div>
               </div>
             </motion.div>
           </>

@@ -6,14 +6,13 @@ import { motion, useSpring, useMotionValue } from "framer-motion";
 export default function CustomCursor() {
   const [isHovered, setIsHovered] = useState(false);
   const [isHidden, setIsHidden] = useState(true);
-  const [isTouchDevice, setIsTouchDevice] = useState(true);
+  const [isTouchDevice, setIsTouchDevice] = useState(true); // Default true structurally, updated via useEffect to prevent hydration skew
 
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   
-  // 0.1s spring delay roughly equates to these stiffness/damping values
-  const springX = useSpring(cursorX, { stiffness: 300, damping: 24, mass: 0.5 });
-  const springY = useSpring(cursorY, { stiffness: 300, damping: 24, mass: 0.5 });
+  const springX = useSpring(cursorX, { stiffness: 500, damping: 28, mass: 0.5 });
+  const springY = useSpring(cursorY, { stiffness: 500, damping: 28, mass: 0.5 });
 
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) {
@@ -38,12 +37,9 @@ export default function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Focus on interactive elements (links, buttons, inputs)
       if (
         target.tagName.toLowerCase() === "a" || 
         target.tagName.toLowerCase() === "button" || 
-        target.tagName.toLowerCase() === "input" || 
-        target.tagName.toLowerCase() === "textarea" || 
         target.closest("a") || 
         target.closest("button")
       ) {
@@ -67,9 +63,9 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Central Glass Dot (12px) */}
+      {/* Central Solid Dot */}
       <motion.div
-        className="fixed top-0 left-0 w-[12px] h-[12px] rounded-full pointer-events-none z-[9999] select-none shadow-sm backdrop-blur-md border border-white/20 bg-white/20"
+        className="fixed top-0 left-0 w-2.5 h-2.5 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference select-none"
         style={{
           x: cursorX,
           y: cursorY,
@@ -77,33 +73,28 @@ export default function CustomCursor() {
           translateY: "-50%"
         }}
         animate={{
+           scale: isHovered ? 0 : 1,
            opacity: isHidden ? 0 : 1
         }}
         transition={{ duration: 0.15 }}
       />
-      {/* Trailing Glass Ring Node (40px -> 60px on hover) */}
+      {/* Trailing Ring Node */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998] select-none backdrop-blur-[2px]"
+        className="fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9998] mix-blend-difference select-none"
         style={{
           x: springX,
           y: springY,
           translateX: "-50%",
           translateY: "-50%"
         }}
-        initial={{ 
-          width: 40, 
-          height: 40,
-          backgroundColor: "rgba(255, 255, 255, 0)", 
-          border: "1px solid rgba(255,255,255,0.2)" 
-        }}
+        initial={{ backgroundColor: "rgba(255, 255, 255, 0)", border: "1px solid rgba(255,255,255,0.4)" }}
         animate={{
-          width: isHovered ? 60 : 40,
-          height: isHovered ? 60 : 40,
-          backgroundColor: isHovered ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0)",
-          border: isHovered ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.3)",
+          scale: isHovered ? 1.5 : 1,
+          backgroundColor: isHovered ? "rgba(255, 255, 255, 1)" : "rgba(255, 255, 255, 0)",
+          border: isHovered ? "1px solid rgba(255,255,255,0)" : "1px solid rgba(255,255,255,0.6)",
           opacity: isHidden ? 0 : 1
         }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.15 }}
       />
     </>
   );
