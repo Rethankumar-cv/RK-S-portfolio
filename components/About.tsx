@@ -41,21 +41,20 @@ function StatItem({ value, label }: { value: string; label: string }) {
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 const STATS = [
-  { value: "3+", label: "Projects shipped" },
-  { value: "2", label: "Hackathons" },
-  { value: "1", label: "Internship" },
+  { value: "3", label: "Featured Projects" },
+  { value: "3", label: "Experience Entries" },
 ];
 
 const CREDENTIALS = [
   {
-    icon: "🏆",
-    text: "1st Place — Web3 Global Hackathon (400+ teams)",
-    color: "text-yellow-400/80",
+    icon: "☁️",
+    text: "Cloud Infrastructure Specialist",
+    color: "text-blue-400/80",
   },
   {
-    icon: "💼",
-    text: "Front-End Engineering Intern @ Acme Vanguard Tech",
-    color: "text-indigo-400/80",
+    icon: "⚡",
+    text: "Front-End Developer @ XYLONIC",
+    color: "text-cyan-400/80",
   },
 ];
 
@@ -93,25 +92,19 @@ export default function About() {
             About Me
           </p>
           <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold text-white tracking-tight leading-tight text-glow">
-            Engineering at the{" "}
+            Building systems that{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white/90 to-white/60">
-              edge of design.
+              scale and perform.
             </span>
           </h2>
         </motion.div>
 
         <motion.div variants={itemVariants} className="space-y-4 text-[15px] sm:text-base">
           <p className="text-white/80 font-light leading-relaxed text-glow">
-            I'm a{" "}
-            <strong className="text-white font-medium">
-              UI/UX Designer & Front-End Developer
-            </strong>{" "}
-            who bridges the gap between design and engineering. I don't hand off
-            mockups — I build them.
+            I'm a <strong className="text-white font-medium">Cloud and Front-End Developer</strong> who builds practical, production-oriented digital experiences. Rather than just focusing on how things look, I care deeply about how they run.
           </p>
           <p className="text-white/60 font-light leading-relaxed text-glow">
-            My focus is on interfaces that are fast, accessible, and intentional
-            — where every interaction has a reason for existing.
+            My focus is on clean architecture, performance optimization, accessibility, and high reliability. Whether I'm deploying cloud infrastructure or building responsive UI components, my goal is to deliver software that works flawlessly under pressure.
           </p>
         </motion.div>
 

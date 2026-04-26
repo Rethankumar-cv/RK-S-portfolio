@@ -18,35 +18,33 @@ import GlassContainer from "@/components/ui/GlassContainer";
 
 const FEATURED_PROJECTS = [
   {
-    title: "Aether AI Platform",
-    problem: "ML dashboards overwhelm users with raw, unstructured data.",
-    solution: "Built real-time neural network visualizations with adaptive layout.",
-    impact: "40% faster decision cycles in internal user testing.",
-    tech: ["Next.js", "WebGL", "TypeScript"],
+    title: "GarmentsInsights AI",
+    problem: "Manual defect detection in garment manufacturing is slow and error-prone.",
+    solution: "Developed an AI-powered visual inspection pipeline deployed on the cloud.",
+    impact: "Increased detection accuracy and reduced inspection time by 40%.",
+    tech: ["Python", "TensorFlow", "AWS"],
     color: "from-blue-600/25 to-indigo-600/25",
     glow: "from-blue-500/20 to-indigo-500/20",
     accent: "text-blue-400",
     border: "hover:border-indigo-500/40",
   },
   {
-    title: "Nimbus Cloud Console",
-    problem: "Multi-cloud cost analysis required switching between 4 tools.",
-    solution: "Unified infrastructure monitoring dashboard with live diff views.",
-    impact: "Reduced context-switching time by 60% for DevOps teams.",
-    tech: ["React", "Framer Motion", "Go"],
+    title: "EV Cyberattack Detection",
+    problem: "Electric vehicle networks are increasingly vulnerable to sophisticated cyber threats.",
+    solution: "Engineered a machine learning-based anomaly detection system for EV CAN bus data.",
+    impact: "Successfully identified novel attack vectors with high precision.",
+    tech: ["Machine Learning", "Python", "Data Processing"],
     color: "from-emerald-600/25 to-teal-600/25",
     glow: "from-emerald-500/20 to-teal-500/20",
     accent: "text-emerald-400",
     border: "hover:border-emerald-500/40",
   },
   {
-    title: "Luma DeFi Exchange",
-    problem:
-      "Existing DEX interfaces had steep learning curves and lagged on mobile.",
-    solution:
-      "Glassmorphic order book UI with simplified wallet flow and sub-100ms re-renders.",
-    impact: "1st place — Web3 Global Hackathon, beating 400+ teams.",
-    tech: ["Web3.js", "TypeScript", "Solidity"],
+    title: "FRAUDDETECT",
+    problem: "Financial institutions struggle with real-time detection of complex fraudulent transactions.",
+    solution: "Built a robust classification model integrated into a high-throughput data pipeline.",
+    impact: "Enhanced fraud detection rates while minimizing false positives.",
+    tech: ["Scikit-learn", "Pandas", "Cloud Backend"],
     color: "from-fuchsia-600/25 to-purple-600/25",
     glow: "from-fuchsia-500/20 to-purple-500/20",
     accent: "text-fuchsia-400",
@@ -54,29 +52,13 @@ const FEATURED_PROJECTS = [
   },
 ];
 
-const MORE_PROJECTS = [
-  {
-    title: "Nova Design System",
-    description: "Open-source component library — brutalist meets micro-interactions.",
-    tech: ["Vue", "CSS Modules", "Storybook"],
-    accent: "text-orange-400",
-    border: "hover:border-orange-500/30",
-  },
-  {
-    title: "Vanguard OS",
-    description: "Web-based OS UI experiment with complex state and floating windows.",
-    tech: ["React", "Zustand", "Framer Motion"],
-    accent: "text-cyan-400",
-    border: "hover:border-cyan-500/30",
-  },
-  {
-    title: "Hyperion Analytics",
-    description: "Enterprise dashboard converting chaotic datasets into visual maps.",
-    tech: ["Next.js", "D3.js", "Tailwind"],
-    accent: "text-purple-400",
-    border: "hover:border-purple-500/30",
-  },
-];
+const MORE_PROJECTS: {
+    title: string;
+    description: string;
+    tech: string[];
+    accent: string;
+    border: string;
+}[] = [];
 
 // ─── Variants ─────────────────────────────────────────────────────────────────
 
@@ -318,6 +300,7 @@ export default function Projects() {
       </motion.div>
 
       {/* "More Work" section */}
+      {MORE_PROJECTS.length > 0 && (
       <div className="mt-10 sm:mt-12">
         <div className="flex items-center gap-4 mb-5">
           <div className="flex-1 h-px bg-white/[0.06]" />
@@ -363,6 +346,7 @@ export default function Projects() {
           )}
         </AnimatePresence>
       </div>
+      )}
         </div>
       </GlassContainer>
     </section>

@@ -52,14 +52,8 @@ const certItemVariants: Variants = {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const METRICS = [
-  { end: 60, suffix: "%", label: "CLS improvement" },
-  { end: 3, suffix: "", label: "Teams using library" },
-];
-
-const CERTS = [
-  { name: "AWS Developer", org: "Amazon Web Services", color: "text-emerald-400" },
-  { name: "Meta Front-End Pro", org: "Coursera / Meta", color: "text-cyan-400" },
-  { name: "Google UX Design", org: "Coursera / Google", color: "text-yellow-400/80" },
+  { end: 40, suffix: "%", label: "Performance Optimization" },
+  { end: 100, suffix: "%", label: "Delivery Success" },
 ];
 
 export default function Experience() {
@@ -125,13 +119,13 @@ export default function Experience() {
                 </div>
 
                 <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-1">
-                  Front-End Engineering Intern
+                  Front-End Developer
                 </h3>
                 <p className="text-white/80 text-sm font-medium mb-3 text-glow">
-                  @ Acme Vanguard Tech
+                  @ XYLONIC Technology
                 </p>
                 <p className="text-white/60 text-[13px] sm:text-sm leading-relaxed max-w-xl text-glow">
-                  Migrated legacy dashboard states into a unified React architecture. Improved Core Web Vitals CLS score and shipped a modular component library adopted by 3 internal teams.
+                  Developed and optimized responsive web applications focusing on performance and scalability. Collaborated with cross-functional teams to deliver seamless user experiences and robust functionality.
                 </p>
 
                 {/* Outcome metrics — count up when in view */}
@@ -175,36 +169,27 @@ export default function Experience() {
           >
             <div className="flex items-center gap-2.5 mb-6">
               <span className="px-2.5 py-1 bg-fuchsia-500/15 border border-fuchsia-500/25 text-fuchsia-300 text-[10px] font-bold uppercase tracking-wider rounded-full">
-                Hackathons
+                Software Development
               </span>
             </div>
 
             <div className="space-y-5 flex-1">
-              <div className="relative pl-5 pb-5 border-l border-white/[0.07]">
+              <div className="relative pl-5 border-l border-white/[0.07]">
                 <div className="absolute -left-[5px] top-[6px] w-2 h-2 rounded-full bg-fuchsia-400 shadow-[0_0_8px_rgba(232,121,249,0.7)]" />
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-sm font-bold text-white">1st Place — Web3 Global Build</h4>
-                  <span className="text-base">🏆</span>
+                  <h4 className="text-sm font-bold text-white">Reccsar</h4>
+                  <span className="text-base">💼</span>
                 </div>
-                <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-2 text-glow">Dec 2024 · 400+ teams</p>
+                <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-2 text-glow">Developer Role</p>
                 <p className="text-white/60 text-[13px] leading-relaxed text-glow">
-                  Built a decentralized exchange with glassmorphic order books and sub-100ms wallet sync.
-                </p>
-              </div>
-
-              <div className="relative pl-5 border-l border-white/[0.07]">
-                <div className="absolute -left-[5px] top-[6px] w-2 h-2 rounded-full bg-neutral-700 group-hover:bg-fuchsia-400/50 transition-colors duration-300" />
-                <h4 className="text-sm font-bold text-white mb-1">Finalist — AI Design Jam</h4>
-                <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-2 text-glow">Sep 2024</p>
-                <p className="text-white/60 text-[13px] leading-relaxed text-glow">
-                  Prototyped a generative AI layout tool. Highest usability score among all finalists.
+                  Contributed to core development and system integration, ensuring high reliability and continuous feature delivery.
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* ── Certifications ── */}
+        {/* ── Infosys Springboard ── */}
         <motion.div
           variants={itemVariants}
           whileHover={!isMobile ? { y: -3 } : undefined}
@@ -223,36 +208,23 @@ export default function Experience() {
           >
             <div className="flex items-center gap-2.5 mb-6">
               <span className="px-2.5 py-1 bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 text-[10px] font-bold uppercase tracking-wider rounded-full">
-                Certifications
+                Training & Internship
               </span>
             </div>
 
-            {/* Staggered cert rows */}
-            <motion.div
-              className="flex flex-col gap-3 flex-1 justify-center"
-              variants={certContainerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-30px" }}
-            >
-              {CERTS.map(({ name, org, color }) => (
-                <motion.div
-                  key={name}
-                  variants={certItemVariants}
-                  className="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05] group-hover:bg-white/[0.04] transition-colors duration-300"
-                >
-                  <div className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center shrink-0">
-                    <svg className={cn("w-4 h-4", color)} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-bold text-white leading-snug">{name}</p>
-                    <p className="text-[11px] text-neutral-600 mt-0.5">{org}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+            <div className="space-y-5 flex-1">
+              <div className="relative pl-5 border-l border-white/[0.07]">
+                <div className="absolute -left-[5px] top-[6px] w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="text-sm font-bold text-white">Infosys Springboard</h4>
+                  <span className="text-base">🎓</span>
+                </div>
+                <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-2 text-glow">Intern</p>
+                <p className="text-white/60 text-[13px] leading-relaxed text-glow">
+                  Completed rigorous training in enterprise software development, cloud computing, and modern architectures.
+                </p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </motion.div>

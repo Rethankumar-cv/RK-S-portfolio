@@ -57,13 +57,12 @@ export default function Contact() {
           </h2>
 
           <p className="text-[14px] sm:text-[15px] text-white/60 max-w-md mx-auto font-light leading-relaxed mb-8 sm:mb-10 text-glow">
-            I&apos;m open to full-time roles, freelance projects, and interesting collaborations.
-            Drop me a line.
+            Let’s build something impactful. Reach out for collaborations or opportunities.
           </p>
 
           {/* Primary CTA — email */}
           <motion.a
-            href="mailto:rethankumar@example.com"
+            href="mailto:rethankumarcv@gmail.com"
             whileHover={!isMobile ? { scale: 1.03 } : undefined}
             whileTap={{ scale: 0.96 }}
             className="relative group flex items-center gap-2.5 px-8 sm:px-10 py-4 rounded-full font-bold text-white text-sm sm:text-base tracking-wide overflow-hidden mb-5 min-h-[54px]"
@@ -91,7 +90,7 @@ export default function Contact() {
             {[
               {
                 label: "LinkedIn",
-                href: "#",
+                href: "https://www.linkedin.com/in/rethan-kumar-cv",
                 icon: (
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />

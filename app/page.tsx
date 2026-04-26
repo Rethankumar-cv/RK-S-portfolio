@@ -1,5 +1,4 @@
 import Hero from "@/components/Hero";
-import About from "@/components/About";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import Process from "@/components/Process";
@@ -14,10 +13,6 @@ export default function Home() {
         <Hero />
       </section>
 
-      {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
-        <About />
-      </section>
 
       {/* Projects Section */}
       <section id="projects" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
