@@ -14,8 +14,9 @@ export default function Home() {
       </section>
 
 
+
       {/* Projects Section */}
-      <section id="projects" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
+      <section id="projects" className="flex items-center justify-center border-t border-white/5 py-12 md:py-16">
         <Projects />
       </section>
 

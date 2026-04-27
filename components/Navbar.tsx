@@ -68,7 +68,7 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-[60] flex justify-center mt-4 sm:mt-5 px-4 pointer-events-none"
+        className="fixed top-0 left-0 right-0 z-[1000] flex justify-center mt-4 sm:mt-5 px-4 pointer-events-none"
       >
         <div
           className={cn(
@@ -171,7 +171,7 @@ export default function Navbar() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[55] md:hidden"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[990] md:hidden"
             />
 
             {/* Drawer panel */}
@@ -180,7 +180,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              className="fixed top-0 right-0 h-[100dvh] w-[78vw] max-w-xs bg-[#080808]/98 backdrop-blur-2xl border-l border-white/[0.07] z-[58] md:hidden flex flex-col pt-24 pb-10 px-7"
+              className="fixed top-0 right-0 h-[100dvh] w-[78vw] max-w-xs bg-[#080808]/98 backdrop-blur-2xl border-l border-white/[0.07] z-[995] md:hidden flex flex-col pt-24 pb-10 px-7"
             >
               <nav className="flex flex-col gap-1 flex-1">
                 {NAV_LINKS.map((link, i) => {

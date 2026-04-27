@@ -28,11 +28,11 @@ export default function GlassContainer({
         "relative mx-auto w-full overflow-hidden",
         maxWidth !== "none" && maxWidth,
         "rounded-[24px]",
-        "bg-black/[0.07] backdrop-blur-[28px]",
+        "bg-black/[0.04] backdrop-blur-xl",
         "border border-white/[0.08]",
         "shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)]",
         "transition-all duration-500",
-        isMobile && "bg-white/[0.08] backdrop-blur-[32px] px-4",
+        isMobile && "bg-white/[0.05] backdrop-blur-xl px-4",
         hoverEffect && "hover:border-white/[0.15] hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]",
         className
       )}
