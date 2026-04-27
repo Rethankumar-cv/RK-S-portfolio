@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 interface GlassContainerProps {
   children: ReactNode;
   className?: string;
-  maxWidth?: "max-w-4xl" | "max-w-5xl" | "max-w-6xl" | "max-w-7xl" | "none";
+  maxWidth?: "max-w-4xl" | "max-w-5xl" | "max-w-6xl" | "max-w-7xl" | "max-w-[1400px]" | "none";
   hoverEffect?: boolean;
 }
 
