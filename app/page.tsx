@@ -1,7 +1,7 @@
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
-import Process from "@/components/Process";
+import ImpactAtlas from "@/components/ImpactAtlas";
 import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 
@@ -23,14 +23,14 @@ export default function Home() {
         <Experience />
       </section>
 
+      {/* Impact Section */}
+      <section id="process" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
+        <ImpactAtlas />
+      </section>
+
       {/* Skills Section */}
       <section id="skills" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <Skills />
-      </section>
-
-      {/* Process Section */}
-      <section id="process" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
-        <Process />
       </section>
 
       {/* Contact Section */}
