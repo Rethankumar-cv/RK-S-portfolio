@@ -1,347 +1,263 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { ExternalLink, Trophy, BadgeCheck, Users, MapPin, Target, Sparkles } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useSpring, Variants } from "framer-motion";
+import { useRef, useState } from "react";
+import { ExternalLink, Trophy, BadgeCheck, Users, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type BaseCategory = "Competitions" | "Certifications" | "Community" | "Leadership";
-type FilterCategory = "All" | "Wins" | BaseCategory;
+type Category = "Competitions" | "Leadership" | "Certifications" | "Community";
 
-interface ImpactCard {
-  id: string;
-  category: BaseCategory;
-  isWin?: boolean;
-  title: string;
-  organizer: string;
-  date: string;
-  roleOrOutcome?: string;
-  note: string;
-  actionText?: string;
-  highlight?: boolean;
+interface CardData {
+  id: string; title: string; organizer: string; date: string;
+  result: string; note: string; isWin?: boolean; featured?: boolean;
+  duration?: string; actionText?: string;
 }
 
-const IMPACT_DATA: ImpactCard[] = [
-  {
-    id: "qt3",
-    category: "Competitions",
-    isWin: true,
-    title: "IEEE QT3 18.0",
-    organizer: "IEEE",
-    date: "2024",
-    roleOrOutcome: "1st Place Winner",
-    note: "Secured first place in idea pitching against top-tier teams by presenting a fully architected, scalable tech solution.",
-    actionText: "View project",
-    highlight: true,
-  },
-  {
-    id: "web-master",
-    category: "Leadership",
-    title: "Web Master",
-    organizer: "IEEE KPRIET SB",
-    date: "2024 - Present",
-    roleOrOutcome: "Lead Role",
-    note: "Architecting and managing the digital infrastructure, leading web initiatives, and guiding junior developers.",
-    actionText: "View profile",
-    highlight: true,
-  },
-  {
-    id: "infosys",
-    category: "Certifications",
-    title: "Infosys Springboard",
-    organizer: "Infosys",
-    date: "2023",
-    roleOrOutcome: "Verified Credential",
-    note: "Completed an intensive software engineering track, mastering full-stack architectures and agile methodologies.",
-  },
-  {
-    id: "bytztrom",
-    category: "Competitions",
-    title: "Bytztrom’25 Hackathon",
-    organizer: "Bytztrom",
-    date: "2025",
-    roleOrOutcome: "Participant",
-    note: "Developed and deployed a rapid prototype under extreme time constraints in a highly competitive environment.",
-  },
-  {
-    id: "browserstack",
-    category: "Community",
-    title: "BrowserStack Meetup",
-    organizer: "BrowserStack",
-    date: "Coimbatore",
-    roleOrOutcome: "Attendee",
-    note: "Engaged in deep-dive discussions with QA automation experts and frontend performance engineers.",
-  },
-  {
-    id: "digital-lead",
-    category: "Leadership",
-    title: "Digital Lead",
-    organizer: "SSIT KPRIET",
-    date: "2023 - 2024",
-    roleOrOutcome: "Leadership",
-    note: "Spearheaded digital content strategies, driving engagement and managing technical community outreach.",
-  },
-  {
-    id: "hackxelerate",
-    category: "Competitions",
-    title: "HackXelerate’25",
-    organizer: "HackXelerate",
-    date: "2025",
-    roleOrOutcome: "Participant",
-    note: "Showcased advanced integration skills and real-time problem solving in a high-intensity coding marathon.",
-  },
-  {
-    id: "global-certs",
-    category: "Certifications",
-    title: "Global Certifications",
-    organizer: "Multiple Platforms",
-    date: "2023 - 2024",
-    roleOrOutcome: "Certified",
-    note: "Accumulated specialized global certifications validating both fundamental and advanced technical competencies.",
-  },
-  {
-    id: "yukta",
-    category: "Competitions",
-    title: "YUKTA’24 Paper Presentation",
-    organizer: "YUKTA",
-    date: "2024",
-    roleOrOutcome: "Presenter",
-    note: "Authored and presented technical research on modern web patterns to a panel of industry experts and academia.",
-  },
-  {
-    id: "sweet-talkerz",
-    category: "Leadership",
-    title: "Sweet Talkerz",
-    organizer: "Community Org",
-    date: "2023",
-    roleOrOutcome: "Coordinator",
-    note: "Orchestrated large-scale event operations, streamlining communication between diverse technical teams.",
-  },
-  {
-    id: "ieee-meetups",
-    category: "Community",
-    title: "Tech Community Meetups",
-    organizer: "IEEE & Local Groups",
-    date: "2023 - 2024",
-    roleOrOutcome: "Participant",
-    note: "Active participant in regional tech discourse, continuously expanding industry knowledge and network.",
-  }
-];
-
-const FILTERS: FilterCategory[] = ["All", "Wins", "Leadership", "Competitions", "Certifications", "Community"];
-
-const getCategoryIcon = (category: BaseCategory | "Wins") => {
-  switch (category) {
-    case "Wins": return <Trophy className="w-3.5 h-3.5" />;
-    case "Competitions": return <Target className="w-3.5 h-3.5" />;
-    case "Certifications": return <BadgeCheck className="w-3.5 h-3.5" />;
-    case "Community": return <MapPin className="w-3.5 h-3.5" />;
-    case "Leadership": return <Users className="w-3.5 h-3.5" />;
-    default: return <Sparkles className="w-3.5 h-3.5" />;
-  }
+const DATA: Record<Category, CardData[]> = {
+  Competitions: [
+    { id: "qt3", title: "IEEE QT3 18.0", organizer: "IEEE", date: "2024", result: "1st Place", note: "Won idea pitching against top-tier teams with a fully architected, scalable tech solution.", isWin: true, featured: true, actionText: "View Project" },
+    { id: "bytztrom", title: "Bytztrom'25 Hackathon", organizer: "Bytztrom", date: "2025", result: "Participant", note: "Rapid prototype built under extreme time constraints in a highly competitive environment." },
+    { id: "hackxelerate", title: "HackXelerate'25", organizer: "HackXelerate", date: "2025", result: "Participant", note: "Real-time problem solving and advanced integration in a high-intensity coding marathon." },
+    { id: "yukta", title: "YUKTA'24", organizer: "Paper Presentation", date: "2024", result: "Presenter", note: "Technical research on modern web patterns presented to industry experts and academia." },
+  ],
+  Leadership: [
+    { id: "web-master", title: "Web Master", organizer: "IEEE KPRIET SB", date: "2024", duration: "2024 – Present", result: "Lead Role", note: "Architecting digital infrastructure, leading web initiatives, and mentoring junior developers.", featured: true, actionText: "View Profile" },
+    { id: "digital-lead", title: "Digital Lead", organizer: "SSIT KPRIET", date: "2023", duration: "2023 – 2024", result: "Leadership", note: "Spearheaded digital content strategies, driving engagement and community outreach." },
+    { id: "sweet-talkerz", title: "Sweet Talkerz", organizer: "Community Org", date: "2023", result: "Coordinator", note: "Orchestrated large-scale events and streamlined cross-team communication." },
+  ],
+  Certifications: [
+    { id: "infosys", title: "Infosys Springboard", organizer: "Infosys", date: "2023", result: "Verified", note: "Intensive full-stack engineering track covering agile methodologies and modern architectures." },
+    { id: "global-certs", title: "Global Certifications", organizer: "Multiple Platforms", date: "2023–2024", result: "Certified", note: "Specialized credentials validating fundamental and advanced technical competencies." },
+  ],
+  Community: [
+    { id: "browserstack", title: "BrowserStack Meetup", organizer: "BrowserStack · Coimbatore", date: "2024", result: "Attendee", note: "Deep-dive discussions with QA automation experts and frontend performance engineers." },
+    { id: "ieee-meetups", title: "Tech Community Meetups", organizer: "IEEE & Local Groups", date: "2023–2024", result: "Participant", note: "Active in regional tech discourse, expanding industry knowledge and network." },
+  ],
 };
 
-export default function ImpactAtlas() {
-  const [activeFilter, setActiveFilter] = useState<FilterCategory>("All");
+const CFG: Record<Category, {
+  icon: React.ReactNode; accent: string; glow: string;
+  pillActive: string; cardGlow: string; bgGrad: string;
+}> = {
+  Competitions: { icon: <Trophy className="w-4 h-4" />, accent: "text-yellow-400", glow: "rgba(234,179,8,0.18)", pillActive: "border-yellow-500/40 bg-yellow-500/10 text-yellow-300", cardGlow: "from-yellow-500/8 to-transparent", bgGrad: "from-yellow-500/5 via-transparent to-transparent" },
+  Leadership:   { icon: <Users className="w-4 h-4" />,  accent: "text-emerald-400", glow: "rgba(16,185,129,0.18)", pillActive: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300", cardGlow: "from-emerald-500/8 to-transparent", bgGrad: "from-emerald-500/5 via-transparent to-transparent" },
+  Certifications: { icon: <BadgeCheck className="w-4 h-4" />, accent: "text-blue-400", glow: "rgba(99,102,241,0.18)", pillActive: "border-blue-500/40 bg-blue-500/10 text-blue-300", cardGlow: "from-blue-500/8 to-transparent", bgGrad: "from-blue-500/5 via-transparent to-transparent" },
+  Community:    { icon: <MapPin className="w-4 h-4" />,  accent: "text-purple-400", glow: "rgba(168,85,247,0.18)", pillActive: "border-purple-500/40 bg-purple-500/10 text-purple-300", cardGlow: "from-purple-500/8 to-transparent", bgGrad: "from-purple-500/5 via-transparent to-transparent" },
+};
 
-  const filteredData = IMPACT_DATA.filter((item) => {
-    if (activeFilter === "All") return true;
-    if (activeFilter === "Wins") return item.isWin;
-    return item.category === activeFilter;
-  });
+// Per-category animation variants
+const VARIANTS: Record<Category, { container: Variants; item: Variants }> = {
+  Competitions: {
+    container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.04 } }, exit: { opacity: 0, transition: { duration: 0.2 } } },
+    item: { hidden: { opacity: 0, scale: 0.4, y: 24 }, visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 440, damping: 22 } }, exit: { opacity: 0, scale: 0.85, transition: { duration: 0.16 } } },
+  },
+  Leadership: {
+    container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.04 } }, exit: { opacity: 0, transition: { duration: 0.2 } } },
+    item: { hidden: { opacity: 0, y: 64 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 28 } }, exit: { opacity: 0, y: -16, transition: { duration: 0.2 } } },
+  },
+  Certifications: {
+    container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.04 } }, exit: { opacity: 0, transition: { duration: 0.2 } } },
+    item: { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }, exit: { opacity: 0, y: -12, transition: { duration: 0.18 } } },
+  },
+  Community: {
+    container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.16, delayChildren: 0.04 } }, exit: { opacity: 0, transition: { duration: 0.2 } } },
+    item: { hidden: { opacity: 0, y: 28, filter: "blur(8px)" }, visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }, exit: { opacity: 0, filter: "blur(6px)", transition: { duration: 0.22 } } },
+  },
+};
+
+// Magnetic pill button
+function MagneticPill({ label, category, isActive, onClick }: { label: Category; category: Category; isActive: boolean; onClick: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const x = useMotionValue(0); const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 200, damping: 15 });
+  const sy = useSpring(y, { stiffness: 200, damping: 15 });
+  const cfg = CFG[category];
 
   return (
-    <section className="py-24 sm:py-32 flex justify-center w-full px-4 sm:px-8 overflow-hidden relative">
-      {/* Editorial Depth Background */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-[20%] right-[10%] w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[150px] mix-blend-screen" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-blue-500/5 rounded-[100%] blur-[100px] rotate-45 pointer-events-none" />
+    <motion.button
+      ref={ref} style={{ x: sx, y: sy }}
+      onClick={onClick}
+      onMouseMove={(e) => {
+        const r = ref.current!.getBoundingClientRect();
+        x.set((e.clientX - r.left - r.width / 2) * 0.28);
+        y.set((e.clientY - r.top - r.height / 2) * 0.28);
+      }}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+      whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }}
+      className={cn(
+        "relative flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border transition-all duration-300 select-none",
+        isActive ? cfg.pillActive : "bg-white/[0.02] border-white/[0.08] text-white/40 hover:text-white/65 hover:bg-white/[0.05]"
+      )}
+    >
+      {isActive && (
+        <motion.div layoutId="cat-pill" className="absolute inset-0 rounded-full -z-10 blur-lg opacity-60" style={{ background: cfg.glow }} transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} />
+      )}
+      <span className={cn("transition-colors", isActive ? cfg.accent : "opacity-60")}>{cfg.icon}</span>
+      {label}
+    </motion.button>
+  );
+}
+
+// Unified card renderer
+function ImpactCard({ card, category }: { card: CardData; category: Category }) {
+  const cfg = CFG[category];
+  const isComp = category === "Competitions";
+  const isCert = category === "Certifications";
+  const isLead = category === "Leadership";
+  const isComm = category === "Community";
+
+  return (
+    <motion.div
+      variants={VARIANTS[category].item}
+      whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.22 } }}
+      className={cn(
+        "group relative overflow-hidden rounded-2xl border transition-all duration-500",
+        // Competitions: big featured or normal
+        isComp && card.isWin && "border-yellow-500/25 bg-gradient-to-br from-yellow-500/8 to-transparent shadow-[0_0_48px_rgba(234,179,8,0.07)] p-7 sm:p-8",
+        isComp && !card.isWin && "border-white/[0.07] bg-white/[0.02] hover:border-white/12 hover:bg-white/[0.04] p-6",
+        // Leadership
+        isLead && "border-white/[0.07] bg-gradient-to-b from-white/[0.03] to-transparent hover:border-emerald-500/20 hover:shadow-[0_8px_32px_rgba(16,185,129,0.05)] p-6 sm:p-7",
+        // Certifications
+        isCert && "border-white/[0.07] bg-white/[0.02] hover:border-blue-500/20 hover:bg-blue-500/[0.02] p-5 sm:p-6",
+        // Community
+        isComm && "border-white/[0.05] bg-white/[0.01] hover:border-purple-500/15 p-6 sm:p-8",
+      )}
+    >
+      {/* Win marker */}
+      {card.isWin && (
+        <div className="absolute top-5 right-5 flex items-center gap-1.5 text-yellow-400">
+          <Trophy className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-black tracking-[0.18em] uppercase">Win</span>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-4 h-full">
+        {/* Header meta */}
+        <div className="flex items-center gap-3">
+          {isCert && <div className={cn("p-2 rounded-lg bg-blue-500/10", cfg.accent)}><BadgeCheck className="w-4 h-4" /></div>}
+          {isComm && <div className={cn("p-2 rounded-full bg-purple-500/10", cfg.accent)}><MapPin className="w-3.5 h-3.5" /></div>}
+          <span className="text-[10px] font-mono text-white/25 tracking-widest">{card.date}</span>
+          {card.result && (
+            <span className={cn("ml-auto text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border",
+              isComp && card.isWin ? "border-yellow-500/30 bg-yellow-500/10 text-yellow-400" :
+              isLead ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400/80" :
+              isCert ? "border-blue-500/20 bg-blue-500/5 text-blue-400/80" :
+              "border-purple-500/15 text-purple-400/70"
+            )}>{card.result}</span>
+          )}
+        </div>
+
+        {/* Title + org */}
+        <div>
+          <h4 className={cn("font-bold tracking-tight leading-tight mb-1",
+            card.featured || card.isWin ? "text-xl sm:text-2xl text-white" : "text-lg sm:text-xl text-white/88"
+          )}>{card.title}</h4>
+          <p className={cn("text-sm font-medium", isLead ? "text-emerald-400/70" : isComm ? "text-purple-300/60" : "text-white/38")}>
+            {card.organizer}
+          </p>
+          {card.duration && <p className="text-[11px] font-mono text-white/22 mt-0.5">{card.duration}</p>}
+        </div>
+
+        <p className="text-sm text-white/48 leading-relaxed group-hover:text-white/65 transition-colors flex-1">{card.note}</p>
+
+        {card.actionText && (
+          <button className={cn("self-start flex items-center gap-1.5 text-xs font-semibold transition-colors",
+            `${cfg.accent} opacity-50 group-hover:opacity-100`
+          )}>
+            {card.actionText} <ExternalLink className="w-3 h-3" />
+          </button>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+const CATEGORIES: Category[] = ["Competitions", "Leadership", "Certifications", "Community"];
+
+export default function ImpactAtlas() {
+  const [active, setActive] = useState<Category | null>(null);
+
+  const toggle = (cat: Category) => setActive(p => p === cat ? null : cat);
+
+  return (
+    <section className="py-28 sm:py-36 w-full overflow-hidden relative">
+      {/* Animated ambient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div animate={{ x: [0, 28, 0], y: [0, -18, 0] }} transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[5%] left-[12%] w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[140px]" />
+        <motion.div animate={{ x: [0, -22, 0], y: [0, 22, 0] }} transition={{ duration: 27, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+          className="absolute bottom-[5%] right-[8%] w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[130px]" />
+        <AnimatePresence>
+          {active && (
+            <motion.div key={active} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }}
+              className={cn("absolute inset-0 bg-gradient-to-br", CFG[active].bgGrad)} />
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="max-w-6xl w-full z-10 relative">
-        {/* Section Header - Editorial Style */}
-        <div className="mb-20 sm:mb-28 max-w-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="flex items-center gap-3 mb-5">
-              <div className="h-px w-8 bg-indigo-500/50" />
-              <span className="text-xs font-medium tracking-[0.2em] text-indigo-400 uppercase">Career Signals</span>
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 relative z-10">
+
+        {/* CENTERED HERO HEADER */}
+        <div className="text-center mb-16 sm:mb-20">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}>
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div className="h-px w-6 bg-indigo-400/40" />
+              <span className="text-[11px] font-semibold tracking-[0.24em] text-indigo-400 uppercase">Career Signals</span>
+              <div className="h-px w-6 bg-indigo-400/40" />
             </div>
-            <h3 className="text-[clamp(2.5rem,6vw,4.5rem)] font-bold text-white tracking-tighter leading-[1.1] mb-6">
-              Impact <span className="text-transparent bg-clip-text bg-gradient-to-r from-white/60 to-white/30 font-light">Atlas.</span>
+            <h3 className="text-[clamp(3rem,7vw,5.5rem)] font-black text-white tracking-tighter leading-[1.0] mb-5">
+              Impact{" "}
+              <span className="font-thin text-transparent bg-clip-text bg-gradient-to-r from-white/40 to-white/15">Atlas.</span>
             </h3>
-            <p className="text-lg sm:text-xl text-white/50 font-light leading-relaxed max-w-xl">
-              A curated snapshot of wins, continuous learning, leadership, and community participation. Proof of work, beyond the code.
+            <p className="text-base sm:text-lg text-white/40 font-light max-w-sm mx-auto">
+              Proof of wins, leadership, and growth beyond code.
             </p>
           </motion.div>
         </div>
 
-        {/* Sticky Filter Bar */}
-        <div className="sticky top-24 z-30 mb-16 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex overflow-x-auto hide-scrollbar pb-4 sm:pb-0">
-            <div className="flex items-center gap-2 p-1.5 rounded-full bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl shadow-2xl">
-              {FILTERS.map((filter) => {
-                const isActive = activeFilter === filter;
-                return (
-                  <button
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    className="relative px-5 py-2.5 rounded-full text-sm font-medium transition-colors duration-300 whitespace-nowrap group"
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="impact-filter"
-                        className="absolute inset-0 bg-white/[0.08] border border-white/[0.1] rounded-full shadow-[0_0_20px_rgba(255,255,255,0.03)]"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className={cn(
-                      "relative z-10 flex items-center gap-2",
-                      isActive ? "text-white" : "text-white/40 group-hover:text-white/70"
-                    )}>
-                      {filter === "Wins" && <Trophy className="w-3.5 h-3.5" />}
-                      {filter}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        {/* CATEGORY PILLS */}
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-wrap justify-center gap-3 mb-16">
+          {CATEGORIES.map(cat => (
+            <MagneticPill key={cat} label={cat} category={cat} isActive={active === cat} onClick={() => toggle(cat)} />
+          ))}
+        </motion.div>
 
-        {/* Timeline / Proof Map Hybrid Layout */}
-        <div className="relative">
-          {/* Vertical Spine (Desktop only) */}
-          <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-white/[0.08] to-transparent -translate-x-1/2" />
+        {/* INITIAL PROMPT STATE */}
+        <AnimatePresence>
+          {!active && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}
+              className="text-center py-8">
+              <p className="text-sm text-white/20 tracking-widest font-medium uppercase">
+                Select a category to explore
+              </p>
+              <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="mt-4 mx-auto w-px h-8 bg-gradient-to-b from-white/15 to-transparent" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          <div className="flex flex-col space-y-12 sm:space-y-16 md:space-y-24">
-            <AnimatePresence mode="popLayout">
-              {filteredData.map((item, index) => {
-                const isLeft = index % 2 === 0;
-                const isHighlighted = item.highlight || item.isWin;
-                
-                return (
-                  <motion.div
-                    layout
-                    key={item.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: index * 0.05 }}
-                    className="relative"
-                  >
-                    <div className={cn(
-                      "flex flex-col md:flex-row items-center",
-                      isLeft ? "md:flex-row-reverse" : ""
-                    )}>
-                      
-                      {/* Timeline Node - Desktop Only */}
-                      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center z-20">
-                        <div className={cn(
-                          "w-4 h-4 rounded-full border-[3px] transition-all duration-500",
-                          isHighlighted 
-                            ? "bg-indigo-500 border-indigo-200/30 shadow-[0_0_20px_rgba(99,102,241,0.5)] scale-125" 
-                            : "bg-[#0a0a0a] border-white/20"
-                        )} />
-                      </div>
-
-                      {/* Spacer for alternating layout */}
-                      <div className="hidden md:block w-1/2" />
-                      
-                      {/* Content Card Wrapper */}
-                      <div className="w-full md:w-1/2 flex relative z-10">
-                        <div className={cn(
-                          "w-full flex",
-                          isLeft ? "md:pr-16 lg:pr-24 justify-end" : "md:pl-16 lg:pl-24 justify-start"
-                        )}>
-                          
-                          {/* The Card */}
-                          <div className={cn(
-                            "group w-full max-w-md p-7 sm:p-8 rounded-[2rem] transition-all duration-500",
-                            isHighlighted
-                              ? "bg-gradient-to-b from-white/[0.04] to-transparent border border-white/[0.08] shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-white/[0.15] hover:shadow-[0_30px_60px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.2)]"
-                              : "bg-white/[0.01] border border-transparent hover:bg-white/[0.02] hover:border-white/[0.04]"
-                          )}>
-                            
-                            <div className="flex flex-col gap-6">
-                              {/* Meta Header */}
-                              <div className="flex items-center justify-between gap-4">
-                                <div className={cn(
-                                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border",
-                                  isHighlighted 
-                                    ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-300" 
-                                    : "bg-white/[0.03] border-white/[0.05] text-white/50"
-                                )}>
-                                  {getCategoryIcon(item.isWin ? "Wins" : item.category)}
-                                  <span>{item.category}</span>
-                                </div>
-                                <span className="text-xs font-mono text-white/30 tracking-widest">{item.date}</span>
-                              </div>
-
-                              {/* Titles & Desc */}
-                              <div>
-                                <h4 className={cn(
-                                  "font-bold tracking-tight mb-2 leading-tight",
-                                  isHighlighted ? "text-2xl sm:text-3xl text-white" : "text-xl sm:text-2xl text-white/80"
-                                )}>
-                                  {item.title}
-                                </h4>
-                                <div className="flex items-center gap-3 text-sm text-white/40 font-medium mb-4">
-                                  <span>{item.organizer}</span>
-                                  {item.roleOrOutcome && (
-                                    <>
-                                      <span className="w-1 h-1 rounded-full bg-white/20" />
-                                      <span className={cn(
-                                        "px-2 py-0.5 rounded text-[11px] uppercase tracking-wider",
-                                        isHighlighted ? "bg-white/10 text-white/90" : "bg-white/5 text-white/60"
-                                      )}>
-                                        {item.roleOrOutcome}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                                <p className="text-sm sm:text-base text-white/50 leading-relaxed group-hover:text-white/60 transition-colors">
-                                  {item.note}
-                                </p>
-                              </div>
-
-                              {/* Optional Action */}
-                              {item.actionText && (
-                                <div className="pt-2">
-                                  <button className="flex items-center gap-2 text-xs font-semibold text-white/40 group-hover:text-white/80 transition-colors">
-                                    {item.actionText}
-                                    <ExternalLink className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-
-            {filteredData.length === 0 && (
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                className="py-20 text-center text-white/30 font-light tracking-wide"
-              >
-                No signals found for this category.
-              </motion.div>
-            )}
-          </div>
-        </div>
+        {/* CARD REVEAL AREA */}
+        <AnimatePresence mode="wait">
+          {active && (
+            <motion.div
+              key={active}
+              variants={VARIANTS[active].container}
+              initial="hidden" animate="visible" exit="exit"
+              className={cn(
+                "grid gap-5 sm:gap-6",
+                active === "Competitions" && "grid-cols-1 sm:grid-cols-2",
+                active === "Leadership"   && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+                active === "Certifications" && "grid-cols-1 sm:grid-cols-2",
+                active === "Community"    && "grid-cols-1 sm:grid-cols-2",
+              )}
+            >
+              {DATA[active].map(card => (
+                <ImpactCard key={card.id} card={card} category={active} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </section>
