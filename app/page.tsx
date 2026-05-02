@@ -13,11 +13,14 @@ export default function Home() {
         <Hero />
       </section>
 
-
-
       {/* Projects Section */}
       <section id="projects" className="flex items-center justify-center border-t border-white/5 py-12 md:py-16">
         <Projects />
+      </section>
+
+      {/* Experience Section */}
+      <section id="experience" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
+        <Experience />
       </section>
 
       {/* Skills Section */}
@@ -28,11 +31,6 @@ export default function Home() {
       {/* Process Section */}
       <section id="process" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
         <Process />
-      </section>
-      
-      {/* Experience Section */}
-      <section id="experience" className="min-h-screen flex items-center justify-center border-t border-white/5 py-16 md:py-28">
-        <Experience />
       </section>
 
       {/* Contact Section */}
