@@ -1,72 +1,63 @@
-# RK's Premium SaaS Portfolio
+# RK Portfolio | Cinematic Intelligence & Engineering Archive
 
-A high-performance, adaptive portfolio engineered with cinematic motion, liquid glass UI, and device-native responsiveness across mobile, tablet, and desktop. Designed to provide a top-tier SaaS-style user experience.
+A high-performance, cinematic developer portfolio built with **Next.js 16**, **Framer Motion**, and **Three.js**. This repository showcases a premium "Proof-of-Work" experience through the **Impact Atlas**, a futuristic archive of engineering milestones, community participation, and technical certifications.
 
-![Portfolio Preview](./public/preview.png)
+![Impact Atlas Preview](https://via.placeholder.com/1200x600/060606/FFFFFF?text=Impact+Atlas+Cinematic+Experience)
 
-## 🚀 Features
+## 🌌 Core Philosophy
 
-- **Liquid Glassmorphism UI:** Sophisticated translucent surfaces with dynamic reflections, inner glows, and layered drop shadows.
-- **Cinematic WebGL Background:** A highly performant, dynamic WebGL shader background (`ColorBends`) that gracefully degrades to CSS fallbacks on unsupported or lower-end mobile devices.
-- **Interactive Project Showcase:** A custom-built, seamlessly looping horizontal carousel with tactile drag-to-scroll, hover-to-center snapping, and focus-mode cinematic scaling.
-- **Intelligent Navigation:** A modern floating navbar with smart hide/reveal on scroll and interactive pill indicators.
-- **Fluid Micro-Interactions:** Custom framer-motion animations on every element, including a custom mouse cursor that reacts to interactive components.
-- **Mobile-First Responsiveness:** Flawless adaptive layouts that switch from desktop mouse-interactions to native touch-based scrolling.
+This portfolio is engineered to go beyond generic dashboards. It utilizes **Cinematic UI/UX** principles to transform professional history into an immersive narrative journey. Every interaction is designed to communicate **momentum, leadership, and technical depth**.
 
-## 💻 Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Animation:** [Framer Motion](https://www.framer.com/motion/)
-- **Graphics/Shaders:** [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) (react-three-fiber / native shaders)
-- **Deployment:** [Vercel](https://vercel.com/)
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **Logic**: [TypeScript](https://www.typescriptlang.org/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Visuals**: Ambient noise textures, glassmorphism, and dynamic cursor spotlights.
 
-## 🛠️ Installation & Setup
+## 🚀 Key Features
 
-1. **Clone the repository:**
+### 🗺️ Impact Atlas
+An interactive achievement archive divided into three technical tiers:
+- **Competitions**: Immersive memory capsules for hackathons and idea pitching wins.
+- **Ecosystem Signals**: A curated 3-tier grid of community meetups (CNCF, AWS, GDG, etc.) showcasing active engineering culture participation.
+- **Capability Signals**: A verified intelligence layer for professional certifications (Oracle, IBM, MongoDB, AWS, Salesforce, Infosys).
+
+### 🎬 Cinematic Interaction System
+- **Memory Modals**: Scroll-free, viewport-fitted popups with editorial-style storytelling.
+- **Holographic Lightbox**: Fullscreen image expansion with spring-animated gallery navigation.
+- **Dynamic Spotlights**: Cursor-tracking ambient lighting effects that react to user movement.
+- **Magnetic Action Docks**: Physics-based CTA buttons with glowing sweep animations.
+
+### 🧩 Engineering Logic
+- **HighlightedText Engine**: Automatically parses narratives to inject glowing, accent-colored keywords.
+- **Adaptive Layouts**: Grid systems that dynamically adjust visual intensity based on the significance of the event (Hero vs. Primary vs. Workshop).
+- **Responsive Architecture**: Fully optimized for fluid experiences across mobile, tablet, and desktop.
+
+## 📦 Getting Started
+
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/Rethankumar-cv/RK-S-portfolio.git
-   cd RK-S-portfolio
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies**:
    ```bash
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
    ```
 
-3. **Start the development server:**
+3. **Run the development server**:
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
-4. **Open the browser:**
-   Navigate to [http://localhost:3000](http://localhost:3000) to view the application.
+4. **Build for production**:
+   ```bash
+   npm run build
+   ```
 
-## 📂 Project Structure
+## 📜 License
 
-- `app/` - Next.js App Router layout and pages.
-- `components/` - Reusable UI components.
-  - `Hero.tsx` - High-impact landing section.
-  - `About.tsx` - Liquid glass profile showcase.
-  - `Projects.tsx` - Interactive horizontal project carousel.
-  - `Skills.tsx` - Glowing tech stack showcase.
-  - `ui/` - Granular structural components (`GlassContainer`, `BackgroundCanvas`, `CustomCursor`).
-- `lib/` - Utility functions, hooks, and helpers.
-- `styles/` - Global CSS and Tailwind directives.
-
-## 💡 Performance Optimizations
-
-- **Intersection Observer API:** Used to pause off-screen animations and trigger on-scroll visual states dynamically.
-- **Hardware Acceleration:** Animations utilize `transform` and `opacity` properties to ensure smooth 60fps rendering without layout thrashing.
-- **GPU-Accelerated Shaders:** WebGL background offloaded to the GPU to maintain main-thread responsiveness.
-
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
+Designed and Engineered by **Rethan Kumar**. Built for the modern engineering ecosystem.
